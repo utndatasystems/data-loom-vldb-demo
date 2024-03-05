@@ -11,8 +11,8 @@ class LLM:
         self._load_cache()
         self.request_count = 0
 
-    def chat(self, prompt):
-        if prompt in self.cache:
+    def chat(self, prompt, allow_cache=True):
+        if allow_cache and prompt in self.cache:
             return self.cache[prompt]
 
         self.request_count += 1
@@ -39,3 +39,12 @@ class LLM:
 
     def get_request_count(self):
         return self.request_count
+
+    @staticmethod
+    def load_keys(path):
+        import json
+        with open(path) as f:
+            data = json.load(f)
+            ORG = data["ORG"]
+            KEY = data["KEY"]
+            return ORG, KEY
