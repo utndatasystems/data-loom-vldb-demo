@@ -1,9 +1,9 @@
 import './../index.css';
 import React from 'react';
 import * as Backend from '../backend.js';
-import { Link } from "react-router-dom";
+import * as util from "../other/util.js";
 
-export default class StartScreen extends React.Component {
+class StartScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,9 +15,10 @@ export default class StartScreen extends React.Component {
   }
 
   onStart() {
-    Backend.inferSchema(this.state.s3_uri, this.state.s3_secret, this.state.s3_access_key, (res) => {
-      alert(JSON.stringify(res, null, 2));
-    });
+    // Backend.inferSchema(this.state.s3_uri, this.state.s3_secret, this.state.s3_access_key, (res) => {
+    // alert(JSON.stringify(res, null, 2));
+    this.props.navigate('/dashboard/');
+    // });
   }
 
   render() {
@@ -52,3 +53,5 @@ export default class StartScreen extends React.Component {
     )
   }
 }
+
+export default util.withParamsAndNavigation(StartScreen);
