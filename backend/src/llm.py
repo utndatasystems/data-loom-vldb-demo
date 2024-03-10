@@ -2,7 +2,7 @@ from openai import OpenAI
 import pickle
 import os
 
-CACHE_PATH = "backend/cache.pkl"
+CACHE_PATH = "caches/llm.pkl"
 
 
 class LLM:
@@ -13,7 +13,9 @@ class LLM:
 
     def chat(self, prompt, allow_cache=True):
         if allow_cache and prompt in self.cache:
+            print("cache hit!")
             return self.cache[prompt]
+        print("cache miss ...")
 
         self.request_count += 1
         chat_completion = self.client.chat.completions.create(

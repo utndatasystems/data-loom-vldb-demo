@@ -8,28 +8,31 @@ class StartScreen extends React.Component {
     super(props);
     this.state = {
       error: false,
-      s3_uri: "",
-      s3_secret: "",
-      s3_access_key: "",
+      uri: "/Users/alex/workspace/data/tpch1-mixed",
+      s3_access_key_id: "",
+      s3_secret_access_key: "",
     };
   }
 
   onStart() {
-    // Backend.inferSchema(this.state.s3_uri, this.state.s3_secret, this.state.s3_access_key, (res) => {
-    // alert(JSON.stringify(res, null, 2));
-    this.props.navigate('/dashboard/');
-    // });
+    Backend.create_session(this.state.uri, this.state.s3_access_key_id, this.state.s3_secret_access_key, (res) => {
+      if (res.session_id == null) {
+        alert("Unable to create session.");
+        return;
+      }
+      this.props.navigate('/dashboard/' + res.session_id);
+    });
   }
 
   render() {
     return (
       <div>
         <h1>Data Loom</h1>
-        {this.drawInput("S3 URI", "s3_uri")}
+        {this.drawInput("S3 URI", "uri")}
         <div style={{ height: 8 }} />
-        {this.drawInput("Secret", "s3_secret")}
+        {this.drawInput("Access Key Id", "s3_access_key_id")}
         <div style={{ height: 8 }} />
-        {this.drawInput("Access Key", "s3_access_key")}
+        {this.drawInput("Secret Access Key", "s3_secret_access_key")}
         <div style={{ height: 12 }} />
         <div className="cool-button" onClick={() => this.onStart()}>Start</div>
       </div >

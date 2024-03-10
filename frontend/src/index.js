@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import StartScreen from './components/start-screen.js';
 import Dashboard from './components/dashboard.js';
+import Debug from './components/debug.js';
 import * as Backend from './backend.js';
 
 class TopLevelComponent extends React.Component {
@@ -30,7 +31,8 @@ class TopLevelComponent extends React.Component {
 
     return (
       <Routes>
-        <Route exact path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/dashboard/:session_id" exact element={<Dashboard />} />
+        <Route path="/debug/:session_id" exact element={<Debug />} />
         <Route path="/*" element={<StartScreen />} />
       </Routes>
     );

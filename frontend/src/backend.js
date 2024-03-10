@@ -19,7 +19,7 @@ export var changeDisplayedPage = { callback: null };
 // Documentation for fetch API
 // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
-function doRequest(method, url, data, next) {
+function do_request(method, url, data, next) {
     return fetch(url, {
         method: method, // *GET, POST, PUT, DELETE, etc.
         mode: (DEPLOY ? "same-origin" : "cors"), // no-cors, cors, *same-origin
@@ -61,16 +61,14 @@ function doRequest(method, url, data, next) {
     });
 }
 
-export function getDashboardInfo(next) {
-    doRequest("GET", buildRestUri("player-dashboard"), undefined, (res) => {
-        next(res);
-    });
+export function create_session(uri, s3_access_key_id, s3_secret_access_key, next) {
+    do_request("POST", buildRestUri("create-session"), {
+        uri: uri,
+        s3_access_key_id: s3_access_key_id,
+        s3_secret_access_key: s3_secret_access_key,
+    }, next);
 }
 
-export function inferSchema(uri, s3_access_key, s3_secret, next) {
-    doRequest("POST", buildRestUri("infer-schema"), {
-        uri: uri,
-        s3_access_key: s3_access_key,
-        s3_secret: s3_secret,
-    }, next);
+export function get_session(session_id, next) {
+    do_request("GET", buildRestUri("get-session", session_id), undefined, next);
 }
