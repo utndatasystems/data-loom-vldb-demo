@@ -1,6 +1,7 @@
 import os
 from llm_interface import LLM
 from session_manager import Session
+import csv_schema_inference as csv_schema_inference
 import json
 
 prompt = """
@@ -11,11 +12,11 @@ This could be because the name or the file ending indicates that it is not a rel
 Here is an example, given the following file paths:
 ["students_file_1.csv", "lectures/part1.csv", "lectures/part2.csv", "README.md"]
 I would like an output like this:
-{
-"students": ["students_file_1.csv"],
-"lectures": ["lectures/part1.csv", "lectures/part2.csv"],
-"UNKNOWN": ["README.md"]
-}
+[
+{"name": "students", "files": ["students_file_1.csv"]},
+{"name": "lectures", "files": ["lectures/part1.csv", "lectures/part2.csv"]},
+{"name": "UNKNOWN", "files": ["README.md"]}
+]
 Here is the actual input data:
 """
 
@@ -27,6 +28,13 @@ class DataLoom:
     def do_table_discovery(self, session: Session):
         session.files = self._get_files(session.uri)
         self._create_initial_tables(session)
+
+    def do_table_schema_inference(self, session: Session):
+        for table in session.tables:
+            if table["name"] == "UNKNOWN":
+                table["attributes"] = []
+                continue
+            csv_schema_inference.create_schema(session, table, self.llm)
 
     def _get_files(self, path):
         if os.path.exists(path):

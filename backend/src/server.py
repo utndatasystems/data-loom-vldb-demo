@@ -33,7 +33,7 @@ def create_session():
     try:
         data_loom.do_table_discovery(session)
     except Exception as e:
-        session.error = str(e)
+        return {"error": str(e)}
 
     session_manager.update_session(session)
     print(f"created session: {session.id}")
@@ -43,7 +43,13 @@ def create_session():
 
 @app.route('/rest/get-session/<session_id:int>', method=['GET'])
 def get_session(session_id):
-    session = session_manager.get_session(session_id)
+
+    try:
+        session = session_manager.get_session(session_id)
+        data_loom.do_table_schema_inference(session)
+    except Exception as e:
+        return {"error": str(e)}
+
     response.content_type = 'application/json'
     return {"session": json.dumps(vars(session))}
 

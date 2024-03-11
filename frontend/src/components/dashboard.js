@@ -10,35 +10,42 @@ class Dashboard extends React.Component {
 
       this.state = {
          selectedTable: null,
-         session: null
+         session: null,
+         error: null,
       };
 
       const session_id = props.params.session_id;
       Backend.get_session(session_id, res => {
+         if (res.error) {
+            this.setState({
+               error: res.error,
+            });
+            return;
+         }
+
          this.setState({
+            error: null,
             selectedTable: null,
             session: JSON.parse(res.session),
          });
-         console.log()
       });
    }
 
    render() {
+      const error = this.state.error
+      if (error) {
+         return (
+            <div>
+               <p>Server error: {error}</p>
+            </div>
+         );
+      }
+
       const session = this.state.session
       if (session === null) {
          return <div>Loading...</div>;
       }
 
-      if (session.error != null) {
-         return (
-            <div>
-               <p>Error: {session.error}</p>
-               <p>{JSON.stringify(session, null, 2)}</p>
-            </div>
-         );
-      }
-
-      console.log(this.props.params.session_id)
       return (
          <div style={{ display: "flex", flexDirection: "row", height: "100%" }}>
             <GraphPanel session={session} onSelectTable={(table) => this.onSelectTable(table)} />

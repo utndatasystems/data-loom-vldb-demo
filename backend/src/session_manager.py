@@ -30,7 +30,7 @@ class SessionManager:
     def get_session(self, id: str):
         if id in self.cache:
             return self.cache[id]
-        return None
+        raise Exception("Invalid session id.")
 
     def create_session(self, session: Session):
         session.id = len(self.cache)

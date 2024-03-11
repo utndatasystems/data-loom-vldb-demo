@@ -24,32 +24,24 @@ export default class GraphPanel extends React.Component {
 
       const tables = this.props.session.tables
       const my_nodes = []
-      let id = 0
-      for (const iter in tables) {
-         const table = {
-            name: iter,
-            attributes: [],
-            files: tables[iter],
-         };
+      for (let idx = 0; idx < tables.length; idx++) {
+         const table = tables[idx]
 
-         const row = Math.floor(id / 4)
-         const col = id % 4
+         const row = Math.floor(idx / 4)
+         const col = idx % 4
          let x = 20 + (200 * col)
          let y = (10 + 150 * row)
 
-         if (iter == "UNKNOWN") {
+         if (table.name == "UNKNOWN") {
             x = 300
             y = 800
          }
 
          const node = {
-            id: id.toString(),
+            id: idx.toString(),
             data: { label: <TableNode table={table} onSelectTable={(table) => this.props.onSelectTable(table)} /> },
             position: { x: x, y: y },
          }
-
-         console.log(node)
-         id++;
 
          my_nodes.push(node);
       }
