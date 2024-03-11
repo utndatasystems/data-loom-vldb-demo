@@ -1,19 +1,20 @@
 import os
-from llm import LLM
+from llm_interface import LLM
 from session_manager import Session
 import json
 
 prompt = """
-I have a list of file paths.
-Please give me a json file that has a key for each table and an array of associated file names that likely belong to it.
-If a file likely belongs to multiple tables or no table at all, list it under 'UNKNOWN'.
+I have a list of files.
+Please give me a json file that has a key for each table and an array of associated file names.
+If a file likely belongs to no table, list it under 'UNKNOWN'.
+This could be because the name or the file ending indicates that it is not a relational table file.
 Here is an example, given the following file paths:
-["students_file_1.csv", "lectures/part1.csv", "lectures/part2.csv", "test.log"]
+["students_file_1.csv", "lectures/part1.csv", "lectures/part2.csv", "README.md"]
 I would like an output like this:
 {
 "students": ["students_file_1.csv"],
 "lectures": ["lectures/part1.csv", "lectures/part2.csv"],
-"UNKNOWN": ["test.log"]
+"UNKNOWN": ["README.md"]
 }
 Here is the actual input data:
 """
@@ -24,8 +25,8 @@ class DataLoom:
         self.llm = LLM(*LLM.load_keys("secrets.json"))
 
     def start_session(self, session: Session):
-        files = self._get_files(session.uri)
-        self._create_initial_tables(files, session)
+        session.files = self._get_files(session.uri)
+        self._create_initial_tables(session)
 
     def _get_files(self, path):
         if os.path.exists(path):
@@ -39,8 +40,8 @@ class DataLoom:
                 files.append(os.path.join(r, file))
         return [iter.replace(path, "") for iter in files]
 
-    def _create_initial_tables(self, files, session):
-        input = prompt + '\n' + str(files)
+    def _create_initial_tables(self, session: Session):
+        input = prompt + '\n' + str(session.files)
         res = self.llm.chat(input)
         session.add_to_llm_log(input, res)
         session.tables = json.loads(res)

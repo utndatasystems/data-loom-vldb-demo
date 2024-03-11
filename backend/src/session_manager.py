@@ -11,6 +11,8 @@ class Session:
         self.uri = uri
         self.s3_access_key_id = s3_access_key_id
         self.s3_secret_access_key = s3_secret_access_key
+        self.files = []
+        self.tables = []
         self.llm_log = []
 
     def add_to_llm_log(self, input: str, output: str):
