@@ -24,7 +24,7 @@ class DataLoom:
     def __init__(self) -> None:
         self.llm = LLM(*LLM.load_keys("secrets.json"))
 
-    def start_session(self, session: Session):
+    def do_table_discovery(self, session: Session):
         session.files = self._get_files(session.uri)
         self._create_initial_tables(session)
 

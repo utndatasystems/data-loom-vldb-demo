@@ -31,7 +31,7 @@ def create_session():
     session_manager.create_session(session)
 
     try:
-        data_loom.start_session(session)
+        data_loom.do_table_discovery(session)
     except Exception as e:
         session.error = str(e)
 

@@ -94,7 +94,7 @@ export default class GraphPanel extends React.Component {
 
    render() {
       return (
-         <div style={{ width: 800, height: 1000, backgroundColor: "red" }}>
+         <div style={{ width: 800, height: 1000, backgroundColor: "orange" }}>
             <ReactFlow
                nodes={this.state.nodes}
                edges={this.state.edges}

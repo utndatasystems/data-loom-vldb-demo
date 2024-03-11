@@ -5,14 +5,14 @@ export default class TablePanel extends React.Component {
       const table = this.props.selectedTable
       if (table == null) {
          return (
-            <div style={{ backgroundColor: "green", width: 300, height: 300 }}>
+            <div style={{ backgroundColor: "#FFFDD0", width: 300, height: 1000 }}>
                <h1>no table selectd</h1>
             </div>
          );
       }
 
       return (
-         <div style={{ backgroundColor: "green", width: 300, height: 300 }}>
+         <div style={{ backgroundColor: "#FFFDD0", width: 300, height: 1000 }}>
             <h1>{table.name}</h1>
 
             <h2>Attributes</h2>
@@ -32,4 +32,3 @@ export default class TablePanel extends React.Component {
       );
    }
 }
-
