@@ -49,7 +49,7 @@ class Dashboard extends React.Component {
       return (
          <div style={{ display: "flex", flexDirection: "row", height: "100%" }}>
             <GraphPanel session={session} onSelectTable={(table) => this.onSelectTable(table)} />
-            <TablePanel selectedTable={this.state.selectedTable} />
+            <TablePanel session={session} selectedTable={this.state.selectedTable} />
          </div>
       );
    }

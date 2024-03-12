@@ -72,3 +72,9 @@ export function create_session(uri, s3_access_key_id, s3_secret_access_key, next
 export function get_session(session_id, next) {
     do_request("GET", buildRestUri("get-session", session_id), undefined, next);
 }
+
+export function load_table(session_id, table_name, next) {
+    do_request("POST", buildRestUri("load-table", session_id), {
+        table_name: table_name
+    }, next);
+}

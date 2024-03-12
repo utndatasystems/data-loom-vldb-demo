@@ -21,6 +21,12 @@ class Session:
             "output": output
         })
 
+    def find_table(self, table_name):
+        for table in self.tables:
+            if table["name"] == table_name:
+                return table
+        raise Exception(f"Table {table_name} not found in session.")
+
 
 class SessionManager:
     def __init__(self):

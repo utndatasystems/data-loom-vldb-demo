@@ -1,4 +1,5 @@
 import React from 'react';
+import * as Backend from '../backend.js';
 
 export default class TablePanel extends React.Component {
    render() {
@@ -14,6 +15,8 @@ export default class TablePanel extends React.Component {
       return (
          <div style={{ backgroundColor: "#FFFDD0", width: 300, height: 1000 }}>
             <h1>{table.name}</h1>
+
+            <div className="cool-button" onClick={() => this.onLoadTable()}>Load</div>
 
             <h2>Attributes</h2>
             <table>
@@ -43,7 +46,18 @@ export default class TablePanel extends React.Component {
                   return <li key={index}>{attribute}</li>;
                })}
             </ul>
-         </div>
+         </div >
       );
+   }
+
+   onLoadTable() {
+      Backend.load_table(this.props.session.id, this.props.selectedTable.name, (response) => {
+         if (response.error != null) {
+            console.log("ERRORE!!!" + response.error);
+         }
+
+         console.log("allgoodd")
+
+      })
    }
 }
