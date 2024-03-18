@@ -4,6 +4,7 @@ from data_loom import DataLoom
 from sql_generator import SqlGenerator
 from database import Database
 import json
+import time
 
 app = Bottle()
 data_loom = DataLoom()
@@ -36,13 +37,12 @@ def create_session():
         data_loom.do_table_discovery(session)
         data_loom.do_table_schema_inference(session)
         session_manager.update_session(session)
+
+        response.content_type = 'application/json'
+        return {"session_id": session.id}
     except Exception as e:
         print(e)
         return {"error": str(e)}
-
-    print(f"created session: {session.id}")
-    response.content_type = 'application/json'
-    return {"session_id": session.id}
 
 
 @app.route('/rest/get-session/<session_id:int>', method=['GET'])
@@ -50,15 +50,34 @@ def get_session(session_id):
 
     try:
         session = session_manager.get_session(session_id)
+        response.content_type = 'application/json'
+        return {"session": json.dumps(vars(session))}
     except Exception as e:
         print(e)
         return {"error": str(e)}
 
-    response.content_type = 'application/json'
-    return {"session": json.dumps(vars(session))}
-
 
 @app.route('/rest/load-table/<session_id:int>', method=['POST'])
+def load_table(session_id):
+    data = request.json
+    table_name = data['table_name']
+    database_name = data['database_name']
+    assert table_name != None
+    assert database_name != None
+
+    try:
+        session = session_manager.get_session(session_id)
+        table = session.find_table(table_name)
+        sql_statements = SqlGenerator.create_and_load_table(session, table)
+        Database.create(database_name).run_queries(sql_statements)
+        response.content_type = 'application/json'
+        return {"session": json.dumps(vars(session))}
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}
+
+
+@app.route('/rest/create-sql/<session_id:int>', method=['POST'])
 def load_table(session_id):
     data = request.json
     table_name = data['table_name']
@@ -68,13 +87,46 @@ def load_table(session_id):
         session = session_manager.get_session(session_id)
         table = session.find_table(table_name)
         sql_statements = SqlGenerator.create_and_load_table(session, table)
-        Database.create().run_queries(sql_statements)
+        response.content_type = 'application/json'
+        return {"sql": '\n'.join(sql_statements)}
     except Exception as e:
         print(e)
         return {"error": str(e)}
 
-    response.content_type = 'application/json'
-    return {"session": json.dumps(vars(session))}
+
+@app.route('/rest/run-query/<session_id:int>', method=['POST'])
+def run_query(session_id):
+    data = request.json
+    query = data['query']
+    database_name = data['database_name']
+    assert query != None
+    assert database_name != None
+
+    try:
+        db = Database.create(database_name)
+
+        start = time.time()
+        df = db.run_query(query)
+        end = time.time()
+        query_ms = (end - start) * 1000
+
+        # Hack for nanook
+        if type(df) == str:
+            return {"query_result": df, "query_ms": query_ms}
+
+        # For postgres
+        query_result = {}
+        query_result["column_names"] = list(df.columns)
+        rows = []
+        for index, row in df.iterrows():
+            rows.append(list(row))
+        query_result["rows"] = rows
+
+        response.content_type = 'application/json'
+        return {"query_result": query_result, "query_ms": query_ms}
+    except Exception as e:
+        print(e)
+        return {"query_result": str(e), "query_ms": 0}
 
 
 @app.route('/rest/update-session/<session_id:int>', method=['POST'])
@@ -87,12 +139,11 @@ def update_session(session_id):
         session = session_manager.get_session(session_id)
         session.tables = tables
         session_manager.update_session(session)
+        response.content_type = 'application/json'
+        return {"session": json.dumps(vars(session))}
     except Exception as e:
         print(e)
         return {"error": str(e)}
-
-    response.content_type = 'application/json'
-    return {"session": json.dumps(vars(session))}
 
 
 # Needs to go last

@@ -33,5 +33,6 @@ class SqlGenerator:
             SqlGenerator._drop_create_statement(table),
             SqlGenerator._create_table_statement(table),
             *SqlGenerator._load_table_statements(session, table),
+            f"select count(*) from {table['name']};",
         ]
         return sql_statements

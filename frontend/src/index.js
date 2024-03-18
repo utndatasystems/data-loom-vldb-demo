@@ -3,7 +3,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import StartScreen from './components/start-screen.js';
-import Dashboard from './components/dashboard.js';
+import Dashboard from './components/dashboard-screen.js';
 import Debug from './components/debug.js';
 import * as Backend from './backend.js';
 

@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@codemirror/lang-sql": "^6.6.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@uiw/codemirror-themes": "^4.21.24",
+    "@uiw/codemirror-themes-all": "^4.21.24",
+    "@uiw/react-codemirror": "^4.21.24",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.1",

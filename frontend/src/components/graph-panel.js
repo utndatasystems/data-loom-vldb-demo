@@ -42,7 +42,7 @@ export default class GraphPanel extends React.Component {
 
          if (table.name == "UNKNOWN") {
             x = 300
-            y = 800
+            y = 600
          }
 
          const node = {
@@ -69,15 +69,18 @@ export default class GraphPanel extends React.Component {
 
    render() {
       return (
-         <div style={{ width: 800, height: 1000, backgroundColor: "orange" }}>
-            <ReactFlow
-               nodes={this.state.nodes}
-               edges={this.state.edges}
-               onNodesChange={(changes) => this.onNodesChange(changes)}
-               onEdgesChange={(changes) => this.onEdgesChange(changes)}
-            // panOnDrag={false}
-            // zoomOnScroll={false}
-            />
+         <div style={{ width: "100%", height: "100%" }}>
+            <div style={{ width: 800, height: 800 }}>
+               <ReactFlow
+                  defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+                  nodes={this.state.nodes}
+                  edges={this.state.edges}
+                  onNodesChange={(changes) => this.onNodesChange(changes)}
+                  onEdgesChange={(changes) => this.onEdgesChange(changes)}
+                  panOnDrag={false}
+                  zoomOnScroll={false}
+               />
+            </div>
          </div>
       );
    }

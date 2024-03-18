@@ -73,9 +73,23 @@ export function get_session(session_id, next) {
     do_request("GET", buildRestUri("get-session", session_id), undefined, next);
 }
 
-export function load_table(session_id, table_name, next) {
+export function load_table(session_id, database_name, table_name, next) {
     do_request("POST", buildRestUri("load-table", session_id), {
-        table_name: table_name
+        database_name: database_name,
+        table_name: table_name,
+    }, next);
+}
+
+export function create_sql(session_id, table_name, next) {
+    do_request("POST", buildRestUri("create-sql", session_id), {
+        table_name: table_name,
+    }, next);
+}
+
+export function run_query(session_id, database_name, query, next) {
+    do_request("POST", buildRestUri("run-query", session_id), {
+        database_name: database_name,
+        query: query,
     }, next);
 }
 

@@ -6,60 +6,57 @@ export default class TablePanel extends React.Component {
       const table = this.getSelectedTable()
       if (table == null) {
          return (
-            <div style={{ backgroundColor: "#FFFDD0", width: 300, height: 1000 }}>
+            <div style={{ width: 300, height: 1000 }}>
                <h2>no table selected</h2>
             </div>
          );
       }
 
       return (
-         <div className="grid-x grid-padding-x" style={{ backgroundColor: "#FFFDD0", width: 500, height: 1000 }}>
-            <div className="large-12 cell">
-               <div className="callout">
+         <div>
+            <h2 onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer" }}>{table.name}</h2>
 
-                  <h2 onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer" }}>{table.name}</h2>
+            <div className="button" onClick={() => this.onLoadTable()}>Load</div>
+            <span> </span>
+            <div className="button" onClick={() => this.onCreateSql()}>SQL</div>
 
-                  <div className="button" onClick={() => this.onLoadTable()}>Load</div>
+            <h4>Certainty</h4>
+            <p>{table.certainty}</p>
 
-                  <h4>Certainty</h4>
-                  <p>{table.certainty}</p>
-
-                  <h4>Attributes</h4>
-                  <table>
-                     <thead>
-                        <tr>
-                           <th>Attribute</th>
-                           <th>Type</th>
-                           <th>Nullable</th>
+            <h4>Attributes</h4>
+            <table>
+               <thead>
+                  <tr>
+                     <th>Attribute</th>
+                     <th>Type</th>
+                     <th>Nullable</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {table.attributes.map((attribute, index) => {
+                     return (
+                        <tr key={index} style={{ textAlign: "left" }}>
+                           <td>
+                              <pre onClick={() => { this.onEditAttributeName(attribute) }} style={{ cursor: "pointer" }}>{attribute.name}</pre>
+                           </td>
+                           <td>
+                              <pre onClick={() => { this.onEditAttributeType(attribute) }} style={{ cursor: "pointer" }}>{attribute.type}</pre>
+                           </td>
+                           <td>
+                              <pre onClick={() => { this.onEditAttributeNullability(attribute) }} style={{ cursor: "pointer" }}>{attribute.null ? "nullable" : "not null"}</pre>
+                           </td>
                         </tr>
-                     </thead>
-                     <tbody>
-                        {table.attributes.map((attribute, index) => {
-                           return (
-                              <tr key={index} style={{ textAlign: "left" }}>
-                                 <td>
-                                    <pre onClick={() => { this.onEditAttributeName(attribute) }} style={{ cursor: "pointer" }}>{attribute.name}</pre>
-                                 </td>
-                                 <td>
-                                    <pre onClick={() => { this.onEditAttributeType(attribute) }} style={{ cursor: "pointer" }}>{attribute.type}</pre>
-                                 </td>
-                                 <td>
-                                    <pre onClick={() => { this.onEditAttributeNullability(attribute) }} style={{ cursor: "pointer" }}>{attribute.null ? "nullable" : "not null"}</pre>
-                                 </td>
-                              </tr>
-                           );
-                        })}
-                     </tbody>
-                  </table>
+                     );
+                  })}
+               </tbody>
+            </table>
 
-                  <h4>Files</h4>
-                  <ul>
-                     {table.files.map((attribute, index) => {
-                        return <li key={index}>{attribute}</li>;
-                     })}
-                  </ul>
-               </div >
-            </div >
+            <h4>Files</h4>
+            <ul>
+               {table.files.map((attribute, index) => {
+                  return <li key={index}>{attribute}</li>;
+               })}
+            </ul>
          </div >
       );
    }
@@ -73,10 +70,20 @@ export default class TablePanel extends React.Component {
 
    onLoadTable() {
       const table = this.getSelectedTable()
-      Backend.load_table(this.props.session.id, table.name, (response) => {
+      Backend.load_table(this.props.session.id, this.props.database, table.name, (response) => {
          if (response.error != null) {
-            console.log("Error!!!" + response.error);
+            alert("Error!!!" + response.error);
          }
+      })
+   }
+
+   onCreateSql() {
+      const table = this.getSelectedTable()
+      Backend.create_sql(this.props.session.id, table.name, (response) => {
+         if (response.error != null) {
+            alert("Error!!!" + response.error);
+         }
+         this.props.setQuey(response.sql)
       })
    }
 
