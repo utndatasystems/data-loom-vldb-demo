@@ -123,6 +123,5 @@ def create_schema(session: Session, table, llm):
         table["attributes"] = with_header
         return
 
-    _infer_column_names(
-        no_header, table, df_no_header, llm, session)
+    _infer_column_names(no_header, table, df_no_header, llm, session)
     table["attributes"] = no_header

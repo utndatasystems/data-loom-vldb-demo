@@ -78,3 +78,9 @@ export function load_table(session_id, table_name, next) {
         table_name: table_name
     }, next);
 }
+
+export function updateSession(session_id, tables, next) {
+    do_request("POST", buildRestUri("update-session", session_id), {
+        tables: tables,
+    }, next);
+}

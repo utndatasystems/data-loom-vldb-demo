@@ -9,7 +9,7 @@ class Dashboard extends React.Component {
       super(props);
 
       this.state = {
-         selectedTable: null,
+         selected_table_idx: null,
          session: null,
          error: null,
       };
@@ -25,7 +25,7 @@ class Dashboard extends React.Component {
 
          this.setState({
             error: null,
-            selectedTable: null,
+            selected_table_idx: null,
             session: JSON.parse(res.session),
          });
       });
@@ -48,14 +48,30 @@ class Dashboard extends React.Component {
 
       return (
          <div style={{ display: "flex", flexDirection: "row", height: "100%" }}>
-            <GraphPanel session={session} onSelectTable={(table) => this.onSelectTable(table)} />
-            <TablePanel session={session} selectedTable={this.state.selectedTable} />
+            <GraphPanel
+               session={session}
+               onSelectTable={(table) => this.onSelectTable(table)}
+            />
+            <TablePanel
+               session={session}
+               selected_table_idx={this.state.selected_table_idx}
+               onUpdateSession={(session) => this.onUpdateSession(session)}
+            />
          </div>
       );
    }
 
-   onSelectTable(table) {
-      this.setState({ selectedTable: table });
+   onSelectTable(table_idx) {
+      this.setState({ selected_table_idx: table_idx });
+   }
+
+   onUpdateSession(session) {
+      if (session == null || session.id == null) {
+         console.log("got invalid session!")
+         console.log(session)
+         return
+      }
+      this.setState({ session: session });
    }
 }
 

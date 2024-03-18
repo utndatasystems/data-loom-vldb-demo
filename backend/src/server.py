@@ -34,11 +34,12 @@ def create_session():
 
     try:
         data_loom.do_table_discovery(session)
+        data_loom.do_table_schema_inference(session)
+        session_manager.update_session(session)
     except Exception as e:
         print(e)
         return {"error": str(e)}
 
-    session_manager.update_session(session)
     print(f"created session: {session.id}")
     response.content_type = 'application/json'
     return {"session_id": session.id}
@@ -49,9 +50,6 @@ def get_session(session_id):
 
     try:
         session = session_manager.get_session(session_id)
-        if ("attributes" not in session.find_table("region")):
-            data_loom.do_table_schema_inference(session)
-        session_manager._save_cache()
     except Exception as e:
         print(e)
         return {"error": str(e)}
@@ -75,9 +73,26 @@ def load_table(session_id):
         print(e)
         return {"error": str(e)}
 
-    output = "ok ;)"
     response.content_type = 'application/json'
-    return {"session": output}
+    return {"session": json.dumps(vars(session))}
+
+
+@app.route('/rest/update-session/<session_id:int>', method=['POST'])
+def update_session(session_id):
+    data = request.json
+    tables = data['tables']
+    assert tables != None
+
+    try:
+        session = session_manager.get_session(session_id)
+        session.tables = tables
+        session_manager.update_session(session)
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}
+
+    response.content_type = 'application/json'
+    return {"session": json.dumps(vars(session))}
 
 
 # Needs to go last
