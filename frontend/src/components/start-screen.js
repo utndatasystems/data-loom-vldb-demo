@@ -1,4 +1,3 @@
-import './../index.css';
 import React from 'react';
 import * as Backend from '../backend.js';
 import * as util from "../other/util.js";

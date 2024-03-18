@@ -6,16 +6,16 @@ import json
 
 prompt = """
 I have a list of files.
-Please give me a json file that has a key for each table and an array of associated file names.
+Please give me a json file that has a key for each table and an array of associated file names and a certainty (0.0-1.0) of how confident are you about the entry is correct.
 If a file likely belongs to no table, list it under 'UNKNOWN'.
 This could be because the name or the file ending indicates that it is not a relational table file.
 Here is an example, given the following file paths:
 ["students_file_1.csv", "lectures/part1.csv", "lectures/part2.csv", "README.md"]
 I would like an output like this:
 [
-{"name": "students", "files": ["students_file_1.csv"]},
-{"name": "lectures", "files": ["lectures/part1.csv", "lectures/part2.csv"]},
-{"name": "UNKNOWN", "files": ["README.md"]}
+{"name": "students", "files": ["students_file_1.csv"], "certainty": 0.9},
+{"name": "lectures", "files": ["lectures/part1.csv", "lectures/part2.csv"], "certainty": 0.7},
+{"name": "UNKNOWN", "files": ["README.md"], "certainty": 0.8}
 ]
 Here is the actual input data:
 """

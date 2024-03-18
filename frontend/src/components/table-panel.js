@@ -7,45 +7,59 @@ export default class TablePanel extends React.Component {
       if (table == null) {
          return (
             <div style={{ backgroundColor: "#FFFDD0", width: 300, height: 1000 }}>
-               <h1>no table selected</h1>
+               <h2>no table selected</h2>
             </div>
          );
       }
 
       return (
-         <div style={{ backgroundColor: "#FFFDD0", width: 300, height: 1000 }}>
-            <h1>{table.name}</h1>
+         <div className="grid-x grid-padding-x" style={{ backgroundColor: "#FFFDD0", width: 500, height: 1000 }}>
+            <div className="large-12 cell">
+               <div className="callout">
 
-            <div className="cool-button" onClick={() => this.onLoadTable()}>Load</div>
+                  <h2>{table.name}</h2>
 
-            <h2>Attributes</h2>
-            <table>
-               <thead>
-                  <tr>
-                     <th>Attribute</th>
-                     <th>Type</th>
-                     <th>Nullable</th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {table.attributes.map((attribute, index) => {
-                     return (
-                        <tr key={index} style={{ textAlign: "left" }}>
-                           <td><pre onClick={() => { this.onEditAttributeName(attribute) }}>{attribute.name}</pre></td>
-                           <td><pre>{attribute.type}</pre></td>
-                           <td><pre>{attribute.null ? "nullable" : "not null"}</pre></td>
+                  <div className="button" onClick={() => this.onLoadTable()}>Load</div>
+
+                  <h4>Certainty</h4>
+                  <p>{table.certainty}</p>
+
+                  <h4>Attributes</h4>
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>Attribute</th>
+                           <th>Type</th>
+                           <th>Nullable</th>
                         </tr>
-                     );
-                  })}
-               </tbody>
-            </table>
+                     </thead>
+                     <tbody>
+                        {table.attributes.map((attribute, index) => {
+                           return (
+                              <tr key={index} style={{ textAlign: "left" }}>
+                                 <td>
+                                    <pre onClick={() => { this.onEditAttributeName(attribute) }}>{attribute.name}</pre>
+                                 </td>
+                                 <td>
+                                    <pre onClick={() => { this.onEditAttributeType(attribute) }}>{attribute.type}</pre>
+                                 </td>
+                                 <td>
+                                    <pre onClick={() => { this.onEditAttributeNullability(attribute) }}>{attribute.null ? "nullable" : "not null"}</pre>
+                                 </td>
+                              </tr>
+                           );
+                        })}
+                     </tbody>
+                  </table>
 
-            <h2>Files</h2>
-            <ul>
-               {table.files.map((attribute, index) => {
-                  return <li key={index}>{attribute}</li>;
-               })}
-            </ul>
+                  <h4>Files</h4>
+                  <ul>
+                     {table.files.map((attribute, index) => {
+                        return <li key={index}>{attribute}</li>;
+                     })}
+                  </ul>
+               </div >
+            </div >
          </div >
       );
    }
@@ -68,19 +82,24 @@ export default class TablePanel extends React.Component {
    }
 
    onEditAttributeName(attribute) {
+      // EVIL STATE UPDATE
       const new_name = window.prompt("Enter attribute name:", attribute.name);
       if (new_name == '' || new_name == null) return
-
-      // EVIL STATE UPDATE
       attribute.name = new_name
+      this.props.onUpdateSession(this.props.session)
+   }
 
-      const session = this.props.session
-      Backend.updateSession(session.id, session.tables, (response) => {
-         if (response.error) {
-            alert("Error!!!" + response.error);
-            return
-         }
-         this.props.onUpdateSession(JSON.parse(response.session))
-      })
+   onEditAttributeType(attribute) {
+      // EVIL STATE UPDATE
+      const new_type = window.prompt("Enter attribute type:", attribute.type);
+      if (new_type == '' || new_type == null) return
+      attribute.type = new_type
+      this.props.onUpdateSession(this.props.session)
+   }
+
+   onEditAttributeNullability(attribute) {
+      // EVIL STATE UPDATE
+      attribute.null = !attribute.null
+      this.props.onUpdateSession(this.props.session)
    }
 }

@@ -4,9 +4,12 @@ import 'reactflow/dist/style.css';
 
 class TableNode extends React.Component {
    render() {
+      // Map 0-1 to a color between orange and green
+      const color = `rgb(${255 * (1 - this.props.certainty)}, ${255 * this.props.certainty}, 0)`
+
       return (
-         <div onClick={() => this.onSelectTable()}>
-            <h1>{this.props.table.name}</h1>
+         <div onClick={() => this.onSelectTable()} style={{ backgroundColor: color }}>
+            <h4>{this.props.table.name}</h4>
             <p>{this.props.table.attributes.length} attributes</p>
             <p>{this.props.table.files.length} files</p>
          </div>
@@ -23,9 +26,14 @@ export default class GraphPanel extends React.Component {
       super(props);
 
       const tables = this.props.session.tables
+
+      const min_certainty = tables.reduce((min, table) => Math.min(min, table.certainty), 1)
+      const max_certainty = tables.reduce((max, table) => Math.max(max, table.certainty), 0)
+      const certainty_range = max_certainty - min_certainty
       const my_nodes = []
       for (let idx = 0; idx < tables.length; idx++) {
          const table = tables[idx]
+         const certainty = (table.certainty - min_certainty) / certainty_range
 
          const row = Math.floor(idx / 4)
          const col = idx % 4
@@ -40,7 +48,7 @@ export default class GraphPanel extends React.Component {
          const node = {
             id: idx.toString(),
             data: {
-               label: <TableNode table={table} onSelectTable={(table) => {
+               label: <TableNode table={table} certainty={certainty} onSelectTable={(table) => {
                   this.props.onSelectTable(idx)
                }} />
             },

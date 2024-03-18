@@ -66,12 +66,15 @@ class Dashboard extends React.Component {
    }
 
    onUpdateSession(session) {
-      if (session == null || session.id == null) {
-         console.log("got invalid session!")
-         console.log(session)
-         return
-      }
-      this.setState({ session: session });
+      Backend.updateSession(session.id, session.tables, (response) => {
+         if (response.error || session == null || session.id == null) {
+            console.log("Error updating session!")
+            console.log("Error: " + response.error)
+            console.log(session)
+            return
+         }
+         this.setState({ session: JSON.parse(response.session) });
+      })
    }
 }
 
