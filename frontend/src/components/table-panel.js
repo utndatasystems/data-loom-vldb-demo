@@ -17,7 +17,7 @@ export default class TablePanel extends React.Component {
             <div className="large-12 cell">
                <div className="callout">
 
-                  <h2>{table.name}</h2>
+                  <h2 onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer" }}>{table.name}</h2>
 
                   <div className="button" onClick={() => this.onLoadTable()}>Load</div>
 
@@ -38,13 +38,13 @@ export default class TablePanel extends React.Component {
                            return (
                               <tr key={index} style={{ textAlign: "left" }}>
                                  <td>
-                                    <pre onClick={() => { this.onEditAttributeName(attribute) }}>{attribute.name}</pre>
+                                    <pre onClick={() => { this.onEditAttributeName(attribute) }} style={{ cursor: "pointer" }}>{attribute.name}</pre>
                                  </td>
                                  <td>
-                                    <pre onClick={() => { this.onEditAttributeType(attribute) }}>{attribute.type}</pre>
+                                    <pre onClick={() => { this.onEditAttributeType(attribute) }} style={{ cursor: "pointer" }}>{attribute.type}</pre>
                                  </td>
                                  <td>
-                                    <pre onClick={() => { this.onEditAttributeNullability(attribute) }}>{attribute.null ? "nullable" : "not null"}</pre>
+                                    <pre onClick={() => { this.onEditAttributeNullability(attribute) }} style={{ cursor: "pointer" }}>{attribute.null ? "nullable" : "not null"}</pre>
                                  </td>
                               </tr>
                            );
@@ -77,8 +77,16 @@ export default class TablePanel extends React.Component {
          if (response.error != null) {
             console.log("Error!!!" + response.error);
          }
-         console.log("allgoodd")
       })
+   }
+
+   onEditTableName() {
+      // EVIL STATE UPDATE
+      let table = this.getSelectedTable()
+      const new_name = window.prompt("Enter table name:", table.name);
+      if (new_name == '' || new_name == null) return
+      table.name = new_name
+      this.props.onUpdateSession(this.props.session)
    }
 
    onEditAttributeName(attribute) {
