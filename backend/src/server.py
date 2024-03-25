@@ -137,11 +137,14 @@ def run_query(session_id):
 def update_session(session_id):
     data = request.json
     tables = data['tables']
+    unknown_files = data['unknown_files']
     assert tables != None
+    assert unknown_files != None
 
     try:
         session = session_manager.get_session(session_id)
         session.tables = tables
+        session.unknown_files = unknown_files
         session_manager.update_session(session)
         response.content_type = 'application/json'
         return {"session": json.dumps(vars(session))}

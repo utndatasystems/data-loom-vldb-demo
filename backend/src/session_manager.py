@@ -13,6 +13,7 @@ class Session:
         self.s3_secret_access_key = s3_secret_access_key
         self.files = []
         self.tables = []
+        self.unknown_files = []
         self.llm_log = []
 
     def add_to_llm_log(self, input: str, output: str):

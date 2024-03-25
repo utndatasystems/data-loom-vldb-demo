@@ -90,11 +90,20 @@ export default class TablePanel extends React.Component {
                   return (
                      <li key={index}>
                         <a href={"#"} onClick={() => { this.props.onPreviewFile(file_path) }}>{file_path}</a>
+                        <span onClick={() => { this.removeFile(file_path) }} style={{ cursor: "pointer" }}>   ❌</span>
                      </li>);
                })}
             </ul>
          </div>
       );
+   }
+
+   removeFile(file_path) {
+      // EVIL STATE UPDATE
+      const table = this.getSelectedTable()
+      table.files = table.files.filter((path) => path !== file_path)
+      this.props.session.unknown_files.push(file_path)
+      this.props.onUpdateSession(this.props.session)
    }
 
    getSelectedTable() {

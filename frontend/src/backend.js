@@ -99,8 +99,9 @@ export function get_file_preview(session_id, file_path, next) {
     }, next);
 }
 
-export function updateSession(session_id, tables, next) {
+export function updateSession(session_id, tables, unknown_files, next) {
     do_request("POST", buildRestUri("update-session", session_id), {
         tables: tables,
+        unknown_files: unknown_files,
     }, next);
 }

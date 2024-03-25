@@ -133,7 +133,7 @@ class Dashboard extends React.Component {
    }
 
    onUpdateSession(session) {
-      Backend.updateSession(session.id, session.tables, (response) => {
+      Backend.updateSession(session.id, session.tables, session.unknown_files, (response) => {
          if (response.error || session == null || session.id == null) {
             alert("Error updating session!")
             console.log("Error: " + response.error)

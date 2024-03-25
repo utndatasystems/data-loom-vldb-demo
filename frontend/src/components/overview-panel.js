@@ -6,20 +6,12 @@ export default class OverviewPanel extends React.Component {
    }
 
    render() {
-      let unknown_files = []
-      for (let idx = 0; idx < this.props.session.tables.length; idx++) {
-         const table = this.props.session.tables[idx]
-         if (table.name == "UNKNOWN") {
-            unknown_files = table.files
-            break
-         }
-      }
       const tables = this.props.session.tables
 
       return (
          <div>
             <h4>Tables</h4>
-            <table class="hover">
+            <table className="hover">
                <thead>
                   <tr>
                      <th>Name</th>
@@ -30,23 +22,16 @@ export default class OverviewPanel extends React.Component {
                   </tr>
                </thead>
                <tbody>
-                  {tables.map((table, idx) => { return this.renderTable(table, idx) })}
+                  {tables.map((table, idx) => { return this.renderRow(table, idx) })}
                </tbody>
             </table>
 
-            <h4>Unused files</h4>
-            <ul>
-               {unknown_files.map((file_path, index) => <li key={index}>{file_path}</li>)}
-            </ul>
+            {this.renderUnusedFiles()}
          </div>
       );
    }
 
-   renderTable(table, idx) {
-      if (table.name == "UNKNOWN") {
-         return null;
-      }
-
+   renderRow(table, idx) {
       const is_selected = idx == this.props.selected_table_idx
 
       return (
@@ -64,10 +49,26 @@ export default class OverviewPanel extends React.Component {
                {this.renderCertainty(table)}
             </td>
             <td onClick={() => this.onSwapTableLoaded(table)} style={{ cursor: "pointer" }}>
-               {table.loaded == "yes" ? "✔️" : (table.loaded == "no" ? "❌" : "🔄")}
+               {table.loaded == "yes" ? "✅" : (table.loaded == "no" ? "no" : "🔄")}
             </td>
          </tr>
       );
+   }
+
+   renderUnusedFiles() {
+      let unknown_files = this.props.session.unknown_files
+
+      return (
+         <div><h4>Unused files</h4>
+            <ul>
+               {unknown_files.map((file_path, index) => {
+                  return (
+                     <li key={index}>
+                        <span>{file_path}    </span>
+                        <span onClick={() => { this.onAssignFile(file_path) }}>➡️</span></li>)
+               })}
+            </ul>
+         </div>);
    }
 
    onSwapTableReviewed(table) {
@@ -82,18 +83,29 @@ export default class OverviewPanel extends React.Component {
       this.props.onUpdateSession(this.props.session)
    }
 
+   onAssignFile(file_path) {
+      const target_table = window.prompt("Enter table name:", "");
+      if (target_table == '' || target_table == null) return
+
+      // EVIL STATE UPDATE
+      const table = this.props.session.tables.find(table => table.name == target_table)
+      table.files.push(file_path)
+      this.props.session.unknown_files = this.props.session.unknown_files.filter((path) => path !== file_path)
+      this.props.onUpdateSession(this.props.session)
+   }
+
    renderCertainty(table) {
       if (table.reviewed) {
-         return (<div style={{ color: "green", fontWeight: "bold" }}>reviewed ✔️</div>)
+         return (<div style={{ color: "green" }}>✅</div>)
       }
 
       const certainty = table.certainty
       if (certainty >= 0.85) {
-         return (<div style={{ color: "green" }}>high</div>)
+         return (<div style={{ fontWeight: "bold", color: "green" }}>high</div>)
       }
       if (certainty >= 0.75) {
-         return (<div style={{ color: "#CC7000" }}>medium</div>)
+         return (<div style={{ fontWeight: "bold", color: "#CC7000" }}>medium</div>)
       }
-      return (<div style={{ color: "red" }}>low</div>)
+      return (<div style={{ fontWeight: "bold", color: "red" }}>low</div>)
    }
 }

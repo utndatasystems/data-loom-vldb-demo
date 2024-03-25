@@ -52,8 +52,17 @@ class DataLoom:
         input = prompt + '\n' + str(session.files)
         res = self.llm.chat(input)
         session.add_to_llm_log(input, res)
-        session.tables = json.loads(res)
+        tables = json.loads(res)
 
-        for table in session.tables:
+        for table in tables:
             table["reviewed"] = False
             table["loaded"] = "no"
+
+        # Find the UNKNOWN table
+        unknown_table = None
+        for table in tables:
+            if table["name"] == "UNKNOWN":
+                unknown_table = table
+                break
+        session.unknown_files = unknown_table["files"] if unknown_table else []
+        session.tables = [iter for iter in tables if iter["name"] != "UNKNOWN"]
