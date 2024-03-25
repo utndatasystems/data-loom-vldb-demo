@@ -3,6 +3,7 @@ import TablePanel from './table-panel.js';
 import GraphPanel from './graph-panel.js';
 import OverviewPanel from './overview-panel.js';
 import DatabasePanel from './database-panel.js';
+import FilePreviewPanel from './file-preview-panel.js';
 import * as Backend from '../backend.js';
 import * as util from "../other/util.js";
 
@@ -77,6 +78,13 @@ class Dashboard extends React.Component {
             onExecuteQuery={() => this.onExecuteQuery()}
          />);
       }
+      if (layout === "file-preview") {
+         main_panel = (<FilePreviewPanel
+            session={session}
+            file_path={this.state.file_path}
+            file_preview={this.state.file_preview}
+         />);
+      }
 
       const database = this.state.database
 
@@ -112,6 +120,7 @@ class Dashboard extends React.Component {
                            selected_table_idx={this.state.selected_table_idx}
                            setQuey={(query) => this.setState({ query: query, layout: "database" })}
                            onUpdateSession={(session) => this.onUpdateSession(session)}
+                           onPreviewFile={(file_path) => this.onPreviewFile(file_path)}
                         />
                      </div>
                   </div>
@@ -142,6 +151,19 @@ class Dashboard extends React.Component {
          this.setState({
             query_result: response.query_result,
             query_ms: response.query_ms,
+         })
+      })
+   }
+
+   onPreviewFile(file_path) {
+      Backend.get_file_preview(this.state.session.id, file_path, (response) => {
+         if (response.error != null) {
+            alert("Error!!!" + response.error);
+         }
+         this.setState({
+            layout: "file-preview",
+            file_path: file_path,
+            file_preview: response.file_preview,
          })
       })
    }

@@ -5,6 +5,7 @@ from sql_generator import SqlGenerator
 from database import Database
 import json
 import time
+import pandas as pd
 
 app = Bottle()
 data_loom = DataLoom()
@@ -126,6 +127,7 @@ def run_query(session_id):
         return {"query_result": query_result, "query_ms": query_ms}
     except Exception as e:
         print(e)
+        # Just show the error to the user
         return {"query_result": str(e), "query_ms": 0}
 
 
@@ -146,7 +148,26 @@ def update_session(session_id):
         return {"error": str(e)}
 
 
-# Needs to go last
+@app.route('/rest/get-file-preview/<session_id:int>', method=['POST'])
+def run_query(session_id):
+    data = request.json
+    file_path = data['file_path']
+    assert file_path != None
+
+    try:
+        session = session_manager.get_session(session_id)
+        df = pd.read_csv(session.uri + file_path, nrows=10, header=None)
+        strange_array = df.values
+        proper_array = []
+        for iter in strange_array:
+            proper_array.append(list(iter))
+        return {"file_preview": proper_array}
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}
+
+
+# !!! Needs to go last
 @app.route('/', method='OPTIONS')
 @app.route('/<path:path>', method=['OPTIONS', "GET", "POST"])
 def options_handler(path=None):

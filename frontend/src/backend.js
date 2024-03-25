@@ -93,6 +93,12 @@ export function run_query(session_id, database_name, query, next) {
     }, next);
 }
 
+export function get_file_preview(session_id, file_path, next) {
+    do_request("POST", buildRestUri("get-file-preview", session_id), {
+        file_path: file_path,
+    }, next);
+}
+
 export function updateSession(session_id, tables, next) {
     do_request("POST", buildRestUri("update-session", session_id), {
         tables: tables,

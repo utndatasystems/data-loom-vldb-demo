@@ -23,6 +23,15 @@ export default class TablePanel extends React.Component {
             <h4>Certainty</h4>
             <p>{table.certainty}</p>
 
+            {this.renderAttributes(table)}
+            {this.renderFiles(table)}
+         </div >
+      );
+   }
+
+   renderAttributes(table) {
+      return (
+         <div>
             <h4>Attributes</h4>
             <table>
                <thead>
@@ -50,14 +59,23 @@ export default class TablePanel extends React.Component {
                   })}
                </tbody>
             </table>
+         </div>
+      );
+   }
 
-            <h4>Files</h4>
+   renderFiles(table) {
+      return (
+         <div>
+            <h4> Files</h4>
             <ul>
-               {table.files.map((attribute, index) => {
-                  return <li key={index}>{attribute}</li>;
+               {table.files.map((file_path, index) => {
+                  return (
+                     <li key={index}>
+                        <a href={"#"} onClick={() => { this.props.onPreviewFile(file_path) }}>{file_path}</a>
+                     </li>);
                })}
             </ul>
-         </div >
+         </div>
       );
    }
 
