@@ -7,7 +7,7 @@ class StartScreen extends React.Component {
     super(props);
     this.state = {
       error: false,
-      uri: "/Users/alex/workspace/data/tpch1-mixed",
+      uri: "/Users/alex/workspace/utn-data-loom/tpch-mixed-1",
       s3_access_key_id: "",
       s3_secret_access_key: "",
     };
@@ -25,15 +25,18 @@ class StartScreen extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Data Loom</h1>
-        {this.drawInput("S3 URI", "uri")}
-        <div style={{ height: 8 }} />
-        {this.drawInput("Access Key Id", "s3_access_key_id")}
-        <div style={{ height: 8 }} />
-        {this.drawInput("Secret Access Key", "s3_secret_access_key")}
-        <div style={{ height: 12 }} />
-        <div className="cool-button" onClick={() => this.onStart()}>Start</div>
+      <div className="grid-x grid-padding-x">
+        <div className="large-3 medium-3 cell" style={{ marginTop: "16px", marginBottom: "-16px" }} />
+        <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
+          <h1>Data Loom</h1>
+          {this.drawInput("S3 URI", "uri")}
+          <div style={{ height: 8 }} />
+          {this.drawInput("Access Key Id", "s3_access_key_id")}
+          <div style={{ height: 8 }} />
+          {this.drawInput("Secret Access Key", "s3_secret_access_key")}
+          <div style={{ height: 12 }} />
+          <div className="button" onClick={() => this.onStart()}>Start</div>
+        </div >
       </div >
     );
   }
