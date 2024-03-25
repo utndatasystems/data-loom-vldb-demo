@@ -32,7 +32,7 @@ class Dashboard extends React.Component {
 
          this.setState({
             error: null,
-            layout: "database",
+            layout: "overview",
             selected_table_idx: 0,
             session: JSON.parse(res.session),
          });
@@ -56,10 +56,12 @@ class Dashboard extends React.Component {
 
       let main_panel = null
       const layout = this.state.layout
-      if (layout === "table") {
+      if (layout === "overview") {
          main_panel = (<OverviewPanel
             session={session}
             onSelectTable={(table_idx) => this.setState({ selected_table_idx: table_idx })}
+            onUpdateSession={(session) => this.onUpdateSession(session)}
+            selected_table_idx={this.state.selected_table_idx}
          />);
       }
       if (layout === "graph") {
@@ -91,7 +93,7 @@ class Dashboard extends React.Component {
       return (
          <div className="grid-x grid-padding-x">
             <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
-               <div className={"button " + (layout != "table" ? "secondary" : "")} onClick={() => this.setState({ layout: "table" })}>Table View</div>
+               <div className={"button " + (layout != "overview" ? "secondary" : "")} onClick={() => this.setState({ layout: "overview" })}>Table View</div>
                <span> </span>
                <div className={"button " + (layout != "graph" ? "secondary" : "")} onClick={() => this.setState({ layout: "graph" })}>UML 4.0 View</div>
                <span> </span>
@@ -102,8 +104,8 @@ class Dashboard extends React.Component {
                <div className={"button " + (database != "postgresql" ? "secondary" : "")} onClick={() => this.setState({ database: "postgresql" })}>PostgreSQL</div>
                <span> </span>
                <div className={"button " + (database != "duckdb" ? "secondary" : "")} onClick={() => this.setState({ database: "duckdb" })}>DuckDb</div>
-               <span> </span>
-               <div className={"button " + (database != "nanook" ? "secondary" : "")} onClick={() => this.setState({ database: "nanook" })}>Peakbase</div>
+               {/* <span> </span>
+               <div className={"button " + (database != "nanook" ? "secondary" : "")} onClick={() => this.setState({ database: "nanook" })}>Peakbase</div> */}
             </div>
             <div className="large-12 medium-12 cell">
                <div className="grid-x grid-padding-x">

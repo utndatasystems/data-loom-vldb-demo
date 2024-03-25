@@ -79,7 +79,7 @@ class PsqlConnection:
         res = ""
         for sql in sql_statements:
             print(f"running: {sql}")
-            res += self.run_query(sql) + '\n'
+            res += str(self.run_query(sql)) + '\n'
         return res
 
     def run_query(self, sql):
@@ -90,7 +90,8 @@ class PsqlConnection:
                 return pd.DataFrame()
             rows = cursor.fetchall()
             column_names = [desc[0] for desc in cursor.description]
-            return pd.DataFrame(data=rows, columns=column_names)
+            df = pd.DataFrame(data=rows, columns=column_names)
+            return df
         finally:
             cursor.close()
 

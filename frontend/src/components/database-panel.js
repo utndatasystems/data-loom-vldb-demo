@@ -83,16 +83,18 @@ export default class TableOverview extends React.Component {
          <div>
             <h4>Result</h4>
             <span>Runtime: {query_ms.toFixed(1)}ms</span>
-            <table>
-               <thead>
-                  <tr>
-                     {column_names.map((name, idx) => { return <th key={idx}>{name}</th> })}
-                  </tr>
-               </thead>
-               <tbody>
-                  {rows.map((row, idx) => { return this.renderRow(row, idx) })}
-               </tbody>
-            </table>
+            <div>
+               <table className="table-scroll">
+                  <thead>
+                     <tr>
+                        {column_names.map((name, idx) => { return <th key={idx}>{name}</th> })}
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {rows.map((row, idx) => { return this.renderRow(row, idx) })}
+                  </tbody>
+               </table>
+            </div>
          </div>
       );
    }

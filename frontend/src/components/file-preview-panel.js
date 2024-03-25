@@ -17,21 +17,23 @@ export default class FilePreviewPanel extends React.Component {
       const tables = this.props.session.tables
 
       return (
-         <div style={{ width: "100%", overflow: "scroll" }}>
+         <div >
             <h4>File Preview: {this.props.file_path}</h4>
-            <table>
-               <tbody>
-                  {this.props.file_preview.map((row, idx) => {
-                     return (
-                        <tr key={idx} style={{ textAlign: "left" }}>
-                           {row.map((cell, idx) => {
-                              return <td key={idx}>{cell}</td>
-                           })}
-                        </tr>
-                     )
-                  })}
-               </tbody>
-            </table>
+            <div>
+               <table style={{ overflow: "scroll", fontSize: "10pt" }}>
+                  <tbody>
+                     {this.props.file_preview.map((row, idx) => {
+                        return (
+                           <tr key={idx} style={{ textAlign: "left" }}>
+                              {row.map((cell, idx) => {
+                                 return <td key={idx}>{cell}</td>
+                              })}
+                           </tr>
+                        )
+                     })}
+                  </tbody>
+               </table>
+            </div>
          </div>
       );
    }

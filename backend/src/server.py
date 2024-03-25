@@ -72,6 +72,8 @@ def load_table(session_id):
         sql_statements = SqlGenerator.create_and_load_table(session, table)
         Database.create(database_name).run_queries(sql_statements)
         response.content_type = 'application/json'
+        table["loaded"] = "yes"
+        session_manager.update_session(session)
         return {"session": json.dumps(vars(session))}
     except Exception as e:
         print(e)
@@ -115,12 +117,12 @@ def run_query(session_id):
         if type(df) == str:
             return {"query_result": df, "query_ms": query_ms}
 
-        # For postgres
+        # For postgres and duckdb
         query_result = {}
         query_result["column_names"] = list(df.columns)
         rows = []
         for index, row in df.iterrows():
-            rows.append(list(row))
+            rows.append([str(iter) for iter in row])
         query_result["rows"] = rows
 
         response.content_type = 'application/json'

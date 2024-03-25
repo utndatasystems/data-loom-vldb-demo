@@ -53,3 +53,7 @@ class DataLoom:
         res = self.llm.chat(input)
         session.add_to_llm_log(input, res)
         session.tables = json.loads(res)
+
+        for table in session.tables:
+            table["reviewed"] = False
+            table["loaded"] = "no"

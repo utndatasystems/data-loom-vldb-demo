@@ -16,9 +16,7 @@ export default class TablePanel extends React.Component {
          <div>
             <h2 onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer" }}>{table.name}</h2>
 
-            <div className="button" onClick={() => this.onLoadTable()}>Load</div>
-            <span> </span>
-            <div className="button" onClick={() => this.onCreateSql()}>SQL</div>
+            {this.renderButtons(table)}
 
             <h4>Certainty</h4>
             <p>{table.certainty}</p>
@@ -26,6 +24,26 @@ export default class TablePanel extends React.Component {
             {this.renderAttributes(table)}
             {this.renderFiles(table)}
          </div >
+      );
+   }
+
+   renderButtons(table) {
+      if (table.reviewed) {
+         return (
+            <div>
+               <div className="button" onClick={() => this.onLoadTable()}>Load</div>
+               <span> </span>
+               <div className="button" onClick={() => this.onCreateSql()}>SQL</div>
+               <span> </span>
+               <div className="button" onClick={() => this.onSwapTableReviewed(table)}>Un-review</div>
+            </div>
+         );
+      }
+
+      return (
+         <div>
+            <div className="button" onClick={() => this.onSwapTableReviewed(table)}>Mark Reviewed</div>
+         </div>
       );
    }
 
@@ -87,11 +105,16 @@ export default class TablePanel extends React.Component {
    }
 
    onLoadTable() {
+      // EVIL STATE UPDATE
       const table = this.getSelectedTable()
+      table["loaded"] = "loading"
+      this.props.onUpdateSession(this.props.session)
+
       Backend.load_table(this.props.session.id, this.props.database, table.name, (response) => {
          if (response.error != null) {
             alert("Error!!!" + response.error);
          }
+         this.props.onUpdateSession(JSON.parse(response.session))
       })
    }
 
@@ -133,6 +156,12 @@ export default class TablePanel extends React.Component {
    onEditAttributeNullability(attribute) {
       // EVIL STATE UPDATE
       attribute.null = !attribute.null
+      this.props.onUpdateSession(this.props.session)
+   }
+
+   onSwapTableReviewed(table) {
+      // EVIL STATE UPDATE
+      table.reviewed = !table.reviewed
       this.props.onUpdateSession(this.props.session)
    }
 }
