@@ -26,7 +26,7 @@ export default class FilePreviewPanel extends React.Component {
                         return (
                            <tr key={idx} style={{ textAlign: "left" }}>
                               {row.map((cell, idx) => {
-                                 return <td key={idx}>{cell}</td>
+                                 return <td key={idx} style={{ padding: "5px", margin: "5px" }}>{cell}</td>
                               })}
                            </tr>
                         )

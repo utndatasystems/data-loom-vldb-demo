@@ -172,6 +172,24 @@ def run_query(session_id):
         return {"error": str(e)}
 
 
+@app.route('/rest/update-session-with-llm/<session_id:int>', method=['POST'])
+def update_session_with_llm(session_id):
+    data = request.json
+    question = data['question']
+    table_idx = data['table_idx']
+    assert question != None
+
+    try:
+        session = session_manager.get_session(session_id)
+        data_loom.do_updated_with_question(session, question, table_idx)
+        session_manager.update_session(session)
+        response.content_type = 'application/json'
+        return {"session": json.dumps(vars(session))}
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}
+
+
 # !!! Needs to go last
 @app.route('/', method='OPTIONS')
 @app.route('/<path:path>', method=['OPTIONS', "GET", "POST"])

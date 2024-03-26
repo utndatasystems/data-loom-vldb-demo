@@ -66,3 +66,20 @@ class DataLoom:
                 break
         session.unknown_files = unknown_table["files"] if unknown_table else []
         session.tables = [iter for iter in tables if iter["name"] != "UNKNOWN"]
+
+    def do_updated_with_question(self, session, question, table_idx):
+        table = session.tables[table_idx]
+        table_for_llm = {}
+        table_for_llm["name"] = table["name"]
+        table_for_llm["attributes"] = table["attributes"]
+        prompt = f"""Here is a SQL table with a name and a list of attributes/columns in JSON:\n{
+            json.dumps(table_for_llm)}\n\n{question}\nIn your answer, only print the new JSON."""
+        print(prompt)
+        print("-------------")
+        res = self.llm.chat(prompt)
+        res = res.replace("'", '"')
+        print(res)
+        print("-------------")
+        new_table = json.loads(res)
+        table["name"] = new_table["name"]
+        table["attributes"] = new_table["attributes"]

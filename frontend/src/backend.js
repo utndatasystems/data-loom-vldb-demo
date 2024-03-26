@@ -99,6 +99,13 @@ export function get_file_preview(session_id, file_path, next) {
     }, next);
 }
 
+export function updateSessionWithLlm(session_id, question, table_idx, next) {
+    do_request("POST", buildRestUri("update-session-with-llm", session_id), {
+        question: question,
+        table_idx: table_idx,
+    }, next);
+}
+
 export function updateSession(session_id, tables, unknown_files, next) {
     do_request("POST", buildRestUri("update-session", session_id), {
         tables: tables,

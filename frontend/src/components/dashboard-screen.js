@@ -6,6 +6,7 @@ import DatabasePanel from './database-panel.js';
 import FilePreviewPanel from './file-preview-panel.js';
 import * as Backend from '../backend.js';
 import * as util from "../other/util.js";
+import LlmPanel from './llm-panel.js';
 
 class Dashboard extends React.Component {
    constructor(props) {
@@ -15,6 +16,7 @@ class Dashboard extends React.Component {
          selected_table_idx: null,
          session: null,
          error: null,
+         llm_input: "Could you please mark all columns as nullable?",
          database: "postgresql",
          query: "SELECT relname, pg_size_pretty(pg_total_relation_size(schemaname || '.' || relname)) AS size\nFROM pg_catalog.pg_statio_user_tables\nORDER BY pg_total_relation_size(schemaname || '.' || relname) DESC;",
          query_result: null,
@@ -115,6 +117,15 @@ class Dashboard extends React.Component {
                      </div>
                   </div>
                   <div className="large-4 cell">
+                     <div className="callout">
+                        <LlmPanel
+                           session={session}
+                           selected_table_idx={this.state.selected_table_idx}
+                           llm_input={this.state.llm_input}
+                           onUpdateSession={(session) => this.onUpdateSession(session)}
+                           setLlmInput={(llm_input) => this.setState({ llm_input: llm_input })}
+                        />
+                     </div>
                      <div className="callout">
                         <TablePanel
                            session={session}

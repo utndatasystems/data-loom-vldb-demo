@@ -14,13 +14,9 @@ export default class TablePanel extends React.Component {
 
       return (
          <div>
-            <h2 onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer" }}>{table.name}</h2>
+            <h4>Table: <span onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer" }}>{table.name}</span></h4>
 
             {this.renderButtons(table)}
-
-            <h4>Certainty</h4>
-            <p>{table.certainty}</p>
-
             {this.renderAttributes(table)}
             {this.renderFiles(table)}
          </div >
@@ -50,8 +46,8 @@ export default class TablePanel extends React.Component {
    renderAttributes(table) {
       return (
          <div>
-            <h4>Attributes</h4>
-            <table>
+            <h5>Attributes</h5>
+            <table style={{ fontSize: "10pt", borderCollapse: "collapse" }}>
                <thead>
                   <tr>
                      <th>Attribute</th>
@@ -62,14 +58,14 @@ export default class TablePanel extends React.Component {
                <tbody>
                   {table.attributes.map((attribute, index) => {
                      return (
-                        <tr key={index} style={{ textAlign: "left" }}>
-                           <td>
+                        <tr key={index}>
+                           <td style={{ padding: "5px", margin: "5px" }}>
                               <pre onClick={() => { this.onEditAttributeName(attribute) }} style={{ cursor: "pointer" }}>{attribute.name}</pre>
                            </td>
-                           <td>
+                           <td style={{ padding: "5px", margin: "5px" }}>
                               <pre onClick={() => { this.onEditAttributeType(attribute) }} style={{ cursor: "pointer" }}>{attribute.type}</pre>
                            </td>
-                           <td>
+                           <td style={{ padding: "5px", margin: "5px" }}>
                               <pre onClick={() => { this.onEditAttributeNullability(attribute) }} style={{ cursor: "pointer" }}>{attribute.null ? "nullable" : "not null"}</pre>
                            </td>
                         </tr>
@@ -84,7 +80,7 @@ export default class TablePanel extends React.Component {
    renderFiles(table) {
       return (
          <div>
-            <h4> Files</h4>
+            <h5> Files</h5>
             <ul>
                {table.files.map((file_path, index) => {
                   return (
@@ -141,7 +137,7 @@ export default class TablePanel extends React.Component {
       // EVIL STATE UPDATE
       let table = this.getSelectedTable()
       const new_name = window.prompt("Enter table name:", table.name);
-      if (new_name == '' || new_name == null) return
+      if (new_name === '' || new_name === null) return
       table.name = new_name
       this.props.onUpdateSession(this.props.session)
    }

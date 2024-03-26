@@ -84,7 +84,7 @@ export default class TableOverview extends React.Component {
             <h4>Result</h4>
             <span>Runtime: {query_ms.toFixed(1)}ms</span>
             <div>
-               <table className="table-scroll">
+               <table className="table-scroll" style={{ fontSize: "10pt" }}>
                   <thead>
                      <tr>
                         {column_names.map((name, idx) => { return <th key={idx}>{name}</th> })}
@@ -102,7 +102,7 @@ export default class TableOverview extends React.Component {
    renderRow(row, idx) {
       return (
          <tr key={idx} style={{ textAlign: "left" }}>
-            {row.map((cell, idx) => { return <td key={idx}>{cell}</td> })}
+            {row.map((cell, idx) => { return <td key={idx} style={{ padding: "5px", margin: "5px" }}>{cell}</td> })}
          </tr>
       )
    }
