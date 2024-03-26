@@ -14,8 +14,7 @@ export default class TablePanel extends React.Component {
 
       return (
          <div>
-            <h4>Table: <span onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer" }}>{table.name}</span></h4>
-
+            <h4>Table: <span onClick={() => { this.onEditTableName() }} style={{ cursor: "pointer", fontFamily: "monospace" }}>{table.name}</span></h4>
             {this.renderButtons(table)}
             {this.renderAttributes(table)}
             {this.renderFiles(table)}
@@ -80,7 +79,7 @@ export default class TablePanel extends React.Component {
    renderFiles(table) {
       return (
          <div>
-            <h5> Files</h5>
+            <h5>Table Files</h5>
             <ul>
                {table.files.map((file_path, index) => {
                   return (

@@ -45,10 +45,12 @@ export default class OverviewPanel extends React.Component {
             <td>
                {table.files.length}
             </td>
-            <td onClick={() => this.onSwapTableReviewed(table)} style={{ cursor: "pointer" }}>
+            {/* <td onClick={() => this.onSwapTableReviewed(table)} style={{ cursor: "pointer" }}> */}
+            <td>
                {this.renderCertainty(table)}
             </td>
-            <td onClick={() => this.onSwapTableLoaded(table)} style={{ cursor: "pointer" }}>
+            {/* <td onClick={() => this.onSwapTableLoaded(table)} style={{ cursor: "pointer" }}> */}
+            <td>
                {table.loaded == "yes" ? "✅" : (table.loaded == "no" ? "no" : "🔄")}
             </td>
          </tr>

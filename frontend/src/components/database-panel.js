@@ -48,6 +48,7 @@ export default class TableOverview extends React.Component {
                   onChange={(e) => { this.onUpdateQuery(e) }}
                   style={{ border: "1px solid #aaaaaa" }}
                />
+               <br />
                <button
                   className={"button success"}
                   onClick={() => this.props.onExecuteQuery()}

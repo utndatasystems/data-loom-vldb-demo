@@ -105,7 +105,7 @@ class Dashboard extends React.Component {
             <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
                <div className={"button " + (database != "postgresql" ? "secondary" : "")} onClick={() => this.setState({ database: "postgresql" })}>PostgreSQL</div>
                <span> </span>
-               <div className={"button " + (database != "duckdb" ? "secondary" : "")} onClick={() => this.setState({ database: "duckdb" })}>DuckDb</div>
+               <div className={"button " + (database != "duckdb" ? "secondary" : "")} onClick={() => this.setState({ database: "duckdb" })}>DuckDB</div>
                {/* <span> </span>
                <div className={"button " + (database != "nanook" ? "secondary" : "")} onClick={() => this.setState({ database: "nanook" })}>Peakbase</div> */}
             </div>
