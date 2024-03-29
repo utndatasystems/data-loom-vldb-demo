@@ -16,7 +16,7 @@ class Dashboard extends React.Component {
          selected_table_idx: null,
          session: null,
          error: null,
-         llm_input: "Could you please mark all columns as nullable?",
+         llm_input: "Please mark all columns as nullable",
          database: "postgresql",
          query: "SELECT relname, pg_size_pretty(pg_total_relation_size(schemaname || '.' || relname)) AS size\nFROM pg_catalog.pg_statio_user_tables\nORDER BY pg_total_relation_size(schemaname || '.' || relname) DESC;",
          query_result: null,
@@ -118,15 +118,6 @@ class Dashboard extends React.Component {
                   </div>
                   <div className="large-4 cell">
                      <div className="callout">
-                        <LlmPanel
-                           session={session}
-                           selected_table_idx={this.state.selected_table_idx}
-                           llm_input={this.state.llm_input}
-                           onUpdateSession={(session) => this.onUpdateSession(session)}
-                           setLlmInput={(llm_input) => this.setState({ llm_input: llm_input })}
-                        />
-                     </div>
-                     <div className="callout">
                         <TablePanel
                            session={session}
                            database={database}
@@ -134,6 +125,15 @@ class Dashboard extends React.Component {
                            setQuey={(query) => this.setState({ query: query, layout: "database" })}
                            onUpdateSession={(session) => this.onUpdateSession(session)}
                            onPreviewFile={(file_path) => this.onPreviewFile(file_path)}
+                        />
+                     </div>
+                     <div className="callout">
+                        <LlmPanel
+                           session={session}
+                           selected_table_idx={this.state.selected_table_idx}
+                           llm_input={this.state.llm_input}
+                           onUpdateSession={(session) => this.onUpdateSession(session)}
+                           setLlmInput={(llm_input) => this.setState({ llm_input: llm_input })}
                         />
                      </div>
                   </div>

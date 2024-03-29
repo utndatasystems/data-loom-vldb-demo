@@ -61,7 +61,7 @@ export default class OverviewPanel extends React.Component {
       let unknown_files = this.props.session.unknown_files
 
       return (
-         <div><h4>Unused files</h4>
+         <div><h4>Discarded Files</h4>
             <ul>
                {unknown_files.map((file_path, index) => {
                   return (

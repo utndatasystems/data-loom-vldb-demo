@@ -78,7 +78,7 @@ export default class TablePanel extends React.Component {
 
    renderFiles(table) {
       return (
-         <div>
+         <div style={{ marginBottom: "-20px" }} >
             <h5>Table Files</h5>
             <ul>
                {table.files.map((file_path, index) => {

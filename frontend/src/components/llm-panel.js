@@ -12,8 +12,24 @@ export default class LlmPanel extends React.Component {
    render() {
       return (
          <div>
-            <input type="text" value={this.props.llm_input} onChange={(e) => this.props.setLlmInput(e.target.value)} />
-            {this.renderButton()}
+            <h5>LLMs Q&A</h5>
+            <table>
+               <tr>
+                  <td>
+                     <input type="text" value={this.props.llm_input} onChange={(e) => this.props.setLlmInput(e.target.value)} />
+                  </td>
+                  <td>
+                     <span className="button" onClick={() => this.onUpdateSessionWithLlm()}>Ask</span>
+                  </td>
+               </tr>
+            </table>
+            <form style={{ marginTop: "-20px" }} >
+               <div className="radio" style={{ display: 'flex', flexDirection: 'row' }}>
+                  <label><input type="radio" value="option1" checked={true} />Table-local</label>
+                  <label style={{ marginLeft: '10px' }}><input type="radio" value="option2" />Schema-wide</label>
+                  <label style={{ marginLeft: '10px' }}><input type="checkbox" checked={this.props.readOnly} onChange={(e) => this.props.setReadOnly(e.target.checked)} />Read-only</label>
+               </div>
+            </form>
          </div >
       );
    }
@@ -22,7 +38,7 @@ export default class LlmPanel extends React.Component {
       if (this.state.loading) {
          return <div>🔄</div>
       } else {
-         return <div className="button" onClick={() => this.onUpdateSessionWithLlm()}>Ask</div>
+         return <span className="button" onClick={() => this.onUpdateSessionWithLlm()}>Ask</span>
       }
    }
 
