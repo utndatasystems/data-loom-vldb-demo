@@ -4,7 +4,7 @@ class SqlGenerator:
     def _create_column(col):
         name = col["name"]
         type = col["type"]
-        null = "nullable" if col["null"] else "not null"
+        null = "null" if col["null"] else "not null"
         return f'{name} {type} {null}'
 
     @staticmethod

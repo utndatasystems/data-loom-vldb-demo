@@ -25,11 +25,12 @@ class StartScreen extends React.Component {
 
   render() {
     return (
-      <div className="grid-x grid-padding-x">
+      <div style={{ textAlign: "center" }} className="grid-x grid-padding-x">
         <div className="large-3 medium-3 cell" style={{ marginTop: "16px", marginBottom: "-16px" }} />
         <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
+          <img src="icon.png" style={{ width: "14%", height: "auto" }} />
           <h1>Data Loom</h1>
-          {this.drawInput("S3 URI", "uri")}
+          {this.drawInput("Path", "uri")}
           <div style={{ height: 8 }} />
           {this.drawInput("Access Key Id", "s3_access_key_id")}
           <div style={{ height: 8 }} />

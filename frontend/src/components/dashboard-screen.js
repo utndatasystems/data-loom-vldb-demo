@@ -97,8 +97,8 @@ class Dashboard extends React.Component {
             <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
                <div className={"button " + (layout != "overview" ? "secondary" : "")} onClick={() => this.setState({ layout: "overview" })}>Table View</div>
                <span> </span>
-               <div className={"button " + (layout != "graph" ? "secondary" : "")} onClick={() => this.setState({ layout: "graph" })}>UML 4.0 View</div>
-               <span> </span>
+               {/* <div className={"button " + (layout != "graph" ? "secondary" : "")} onClick={() => this.setState({ layout: "graph" })}>UML 4.0 View</div>
+               <span> </span> */}
                <div className={"button " + (layout != "database" ? "secondary" : "")} onClick={() => this.setState({ layout: "database" })}>Database View</div>
             </div>
 

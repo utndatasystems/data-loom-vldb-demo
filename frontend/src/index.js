@@ -5,6 +5,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import StartScreen from './components/start-screen.js';
 import Dashboard from './components/dashboard-screen.js';
 import Debug from './components/debug.js';
+import IntroScreen from './components/intro.js';
+import TpchSchemaScreen from './components/tpch-schema-screen.js';
 import * as Backend from './backend.js';
 
 class TopLevelComponent extends React.Component {
@@ -33,6 +35,8 @@ class TopLevelComponent extends React.Component {
       <Routes>
         <Route path="/dashboard/:session_id" exact element={<Dashboard />} />
         <Route path="/debug/:session_id" exact element={<Debug />} />
+        <Route path="/intro/" exact element={<IntroScreen />} />
+        <Route path="/tpch/" exact element={<TpchSchemaScreen />} />
         <Route path="/*" element={<StartScreen />} />
       </Routes>
     );

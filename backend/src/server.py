@@ -81,7 +81,7 @@ def load_table(session_id):
 
 
 @app.route('/rest/create-sql/<session_id:int>', method=['POST'])
-def load_table(session_id):
+def create_sql(session_id):
     data = request.json
     table_name = data['table_name']
     assert table_name != None
