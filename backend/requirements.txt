@@ -1,0 +1,5 @@
+bottle
+pandas
+psycopg2
+duckdb
+openai
