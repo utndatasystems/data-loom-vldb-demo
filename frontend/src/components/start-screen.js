@@ -1,13 +1,14 @@
-import React from 'react';
+import React  from 'react';
 import * as Backend from '../backend.js';
 import * as util from "../other/util.js";
+import DropdownMenu from './dropdown_menu.js';
 
 class StartScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       error: false,
-      uri: "/Users/alex/workspace/utn-data-loom/tpch-mixed-1",
+      uri: "",
       s3_access_key_id: "",
       s3_secret_access_key: "",
     };
@@ -23,6 +24,11 @@ class StartScreen extends React.Component {
     });
   }
 
+  handleSelectPath = (path) => {
+    console.log("Selected path:", path);
+    this.setState({ uri: path });
+  };
+
   render() {
     return (
       <div style={{ textAlign: "center" }} className="grid-x grid-padding-x">
@@ -30,8 +36,9 @@ class StartScreen extends React.Component {
         <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
           <img src="icon.png" style={{ width: "14%", height: "auto" }} />
           <h1>Data Loom</h1>
-          {this.drawInput("Path", "uri")}
-          <div style={{ height: 8 }} />
+          <DropdownMenu onSelect={this.handleSelectPath} />
+          {/* {this.drawInput("Path", "uri")} }
+          <div style={{ height: 8 }} /> */}
           {this.drawInput("Access Key Id", "s3_access_key_id")}
           <div style={{ height: 8 }} />
           {this.drawInput("Secret Access Key", "s3_secret_access_key")}
