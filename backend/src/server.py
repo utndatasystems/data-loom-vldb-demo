@@ -33,6 +33,7 @@ def create_session():
     s3_secret_access_key = data['s3_secret_access_key']
     session = Session(None, uri, s3_access_key_id, s3_secret_access_key)
     session_manager.create_session(session)
+    print("created session: " + str(session.id))
 
     try:
         data_loom.do_table_discovery(session)

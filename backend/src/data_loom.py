@@ -52,7 +52,7 @@ class DataLoom:
         input = prompt + '\n' + str(session.files)
         res = self.llm.chat(input)
         session.add_to_llm_log(input, res)
-        tables = json.loads(res)
+        tables = LLM.parse_json_from_response(res)
 
         for table in tables:
             table["reviewed"] = False
@@ -69,17 +69,19 @@ class DataLoom:
 
     def do_updated_with_question(self, session, question, table_idx):
         table = session.tables[table_idx]
+
+        # Assemble question for the llm
         table_for_llm = {}
         table_for_llm["name"] = table["name"]
         table_for_llm["attributes"] = table["attributes"]
         prompt = f"""Here is a SQL table with a name and a list of attributes/columns in JSON:\n{
             json.dumps(table_for_llm)}\n\n{question}\nIn your answer, only print the new JSON."""
-        print(prompt)
-        print("-------------")
+
+        # Prompt the llm
         res = self.llm.chat(prompt)
-        res = res.replace("'", '"')
-        print(res)
-        print("-------------")
-        new_table = json.loads(res)
+        res = res.replace("'", '"')  # LLM tends to return single quotes
+        new_table = LLM.parse_json_from_response(res)
+
+        # Write result back to session
         table["name"] = new_table["name"]
         table["attributes"] = new_table["attributes"]

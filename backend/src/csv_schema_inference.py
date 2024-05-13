@@ -1,7 +1,6 @@
 import pandas as pd
 from llm_interface import LLM
 from session_manager import Session
-import json
 
 
 def _is_bool(value):
@@ -103,7 +102,7 @@ Actual csv input:
 """
     res = llm.chat(prompt)
     session.add_to_llm_log(prompt, res)
-    inferred_column_names = json.loads(res)
+    inferred_column_names = LLM.parse_json_from_response(res)
     for idx, column in enumerate(column_types):
         column["name"] = inferred_column_names[idx]
 

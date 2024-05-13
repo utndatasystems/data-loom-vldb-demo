@@ -1,6 +1,7 @@
 from openai import OpenAI
 import pickle
 import os
+import json
 
 CACHE_PATH = "caches/llm.pkl"
 
@@ -50,3 +51,10 @@ class LLM:
             ORG = data["ORG"]
             KEY = data["KEY"]
             return ORG, KEY
+
+    @staticmethod
+    def parse_json_from_response(response: str):
+        # Sometimes the llm wraps its response in triple backticks (code formatting) -> remove those
+        if response.startswith("```\n") and response.endswith("\n```"):
+            response = response[4:-4]
+        return json.loads(response)
