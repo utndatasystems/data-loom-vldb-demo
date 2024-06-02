@@ -155,7 +155,7 @@ def update_session(session_id):
 
 
 @app.route('/rest/get-file-preview/<session_id:int>', method=['POST'])
-def run_query(session_id):
+def get_file_preview(session_id):
     data = request.json
     file_path = data['file_path']
     assert file_path != None
@@ -177,12 +177,23 @@ def run_query(session_id):
 def update_session_with_llm(session_id):
     data = request.json
     question = data['question']
-    table_idx = data['table_idx']
-    assert question != None
+    mode = data['mode']
+    table_idx = data.get('table_idx', None)
+
+    assert question is not None
+    assert mode is not None
 
     try:
         session = session_manager.get_session(session_id)
-        data_loom.do_updated_with_question(session, question, table_idx)
+
+        if mode == "table-local":
+            assert table_idx is not None
+            data_loom.do_updated_with_questions(session, {"query": question, "table_idx": table_idx}, mode)
+        elif mode == "schema-wide":
+            data_loom.do_updated_with_questions(session, question, mode)
+        else:
+            return {"error": "Invalid mode"}
+
         session_manager.update_session(session)
         response.content_type = 'application/json'
         return {"session": json.dumps(vars(session))}

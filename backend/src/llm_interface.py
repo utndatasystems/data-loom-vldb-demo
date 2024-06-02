@@ -57,4 +57,10 @@ class LLM:
         # Sometimes the llm wraps its response in triple backticks (code formatting) -> remove those
         if response.startswith("```\n") and response.endswith("\n```"):
             response = response[4:-4]
-        return json.loads(response)
+        try:
+            # Attempt to parse response directly as list of JSON objects
+            return json.loads(response)
+        except json.JSONDecodeError:
+            # If it fails, try to split response by known separator and parse individually
+            parts = response.split("\n\n")
+            return [json.loads(part) for part in parts if part.strip()]

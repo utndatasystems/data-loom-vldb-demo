@@ -1,5 +1,6 @@
 import config from './config.js';
 
+
 export const DEPLOY = config.deploy;
 const IP = config.host;
 const PORT = config.port;
@@ -99,10 +100,11 @@ export function get_file_preview(session_id, file_path, next) {
     }, next);
 }
 
-export function updateSessionWithLlm(session_id, question, table_idx, next) {
+export function updateSessionWithLlm(session_id, question, table_idx, mode, next) {
     do_request("POST", buildRestUri("update-session-with-llm", session_id), {
         question: question,
         table_idx: table_idx,
+        mode: mode
     }, next);
 }
 

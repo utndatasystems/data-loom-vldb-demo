@@ -67,21 +67,53 @@ class DataLoom:
         session.unknown_files = unknown_table["files"] if unknown_table else []
         session.tables = [iter for iter in tables if iter["name"] != "UNKNOWN"]
 
-    def do_updated_with_question(self, session, question, table_idx):
-        table = session.tables[table_idx]
+    def do_updated_with_questions(self, session, question, mode="schema-wide"):
+        try:
+            if mode == "schema-wide":
+                # Combine into single prompt
+                all_tables = [{"name": table["name"], "attributes":table["attributes"]} for table in session.tables]
+                combined_prompt = f"""Here are the tables:\n{json.dumps(all_tables)}\n\n{question}\nIn your answer, please provide a JSON array of objects, each corresponding to a table, in the format of each table."""
+                # print(f"Prompt: {combined_prompt}")
 
-        # Assemble question for the llm
-        table_for_llm = {}
-        table_for_llm["name"] = table["name"]
-        table_for_llm["attributes"] = table["attributes"]
-        prompt = f"""Here is a SQL table with a name and a list of attributes/columns in JSON:\n{
-            json.dumps(table_for_llm)}\n\n{question}\nIn your answer, only print the new JSON."""
+                # Prompt the llm
+                res = self.llm.chat(combined_prompt)
+                res = res.replace("'", '"')
 
-        # Prompt the llm
-        res = self.llm.chat(prompt)
-        res = res.replace("'", '"')  # LLM tends to return single quotes
-        new_table = LLM.parse_json_from_response(res)
+                # Parse resonse
+                responses = LLM.parse_json_from_response(res)
+                if isinstance(responses, dict):
+                    responses = [responses]
+                elif not isinstance(responses, list):
+                    raise ValueError("LLM response is not a list or dict of JSON objects")
 
-        # Write result back to session
-        table["name"] = new_table["name"]
-        table["attributes"] = new_table["attributes"]
+                # Write result back to session
+                for idx, new_table in enumerate(responses):
+                    session.tables[idx]["name"] = new_table["name"]
+                    session.tables[idx]["attributes"] = new_table["attributes"]
+
+            elif mode == "table-local":
+                # Handle individual table questions
+                table_idx = int(question['table_idx'])
+                table = session.tables[table_idx]
+
+                # Assemble question for the llm
+                table_for_llm = {
+                    "name": table["name"],
+                    "attributes": table["attributes"]
+                }
+                prompt = f"""Here is a SQL table with a name and a list of attributes/columns in JSON:\n{json.dumps(table_for_llm)}\n\n{question['query']}\nIn your answer, only print the new JSON."""
+
+                # Prompt the llm
+                res = self.llm.chat(prompt)
+                res = res.replace("'", '"')  # LLM tends to return single quotes
+                new_table = LLM.parse_json_from_response(res)
+
+                # Write result back to session
+                table["name"] = new_table["name"]
+                table["attributes"] = new_table["attributes"]
+
+            else:
+                raise ValueError("Invalid mode")
+        except Exception as e:
+            print(f"Error occurred while processing questions: {e}")
+            raise e
