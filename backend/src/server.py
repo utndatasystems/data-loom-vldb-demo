@@ -188,9 +188,9 @@ def update_session_with_llm(session_id):
 
         if mode == "table-local":
             assert table_idx is not None
-            data_loom.do_updated_with_questions(session, {"query": question, "table_idx": table_idx}, mode)
+            data_loom.do_update_with_question(session, question, table_idx)
         elif mode == "schema-wide":
-            data_loom.do_updated_with_questions(session, question, mode)
+            data_loom.do_update_with_questions(session, question)
         else:
             return {"error": "Invalid mode"}
 
