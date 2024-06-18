@@ -6,7 +6,8 @@ export default class LlmPanel extends React.Component {
       super(props);
       this.state = {
          loading: false,
-         mode: ""
+         mode: "",
+         llm_answer: null,
       };
    }
 
@@ -29,16 +30,23 @@ export default class LlmPanel extends React.Component {
                <div className="radio" style={{ display: 'flex', flexDirection: 'row' }}>
                <label style={{ marginLeft: '10px' }}><input type="radio" value="table-local" checked={this.state.mode === "table-local"} onChange={() => this.setMode("table-local")} />Table-local</label>
                <label style={{ marginLeft: '10px' }}><input type="radio" value="schema-wide" checked={this.state.mode === "schema-wide"} onChange={() => this.setMode("schema-wide")} />Schema-wide</label>
-               <label style={{ marginLeft: '10px' }}><input type="checkbox" checked={this.props.readOnly} onChange={(e) => this.props.setReadOnly(e.target.checked)} />Read-only</label>
+               <label style={{ marginLeft: '10px' }}><input type="radio" value="schema-wide" checked={this.state.mode === "read-only"} onChange={() => this.setMode("read-only")} />Read-only</label>
+               {/*<label style={{ marginLeft: '10px' }}><input type="checkbox" checked={this.props.readOnly} onChange={(e) => this.props.setReadOnly(e.target.checked)} />Read-only</label>*/}
                </div>
             </form>
+            {this.state.llm_answer && (
+               <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc' }}>
+                  <h6>LLM Answer:</h6>
+                  <p>{this.state.llm_answer}</p>
+               </div>
+            )}
          </div >
       );
    }
 
    setMode(mode) {
       console.log(mode)
-      this.setState({ mode });
+      this.setState({ mode, llm_answer: null });
    }
 
    renderButton() {
@@ -53,15 +61,25 @@ export default class LlmPanel extends React.Component {
       this.setState({ loading: true });
       const { session, llm_input, selected_table_idx } = this.props;
       const mode = this.state.mode;
-      Backend.updateSessionWithLlm(session.id, llm_input, selected_table_idx, mode, response => {
-         this.setState({ loading: false });
-         if (response.error != null) {
-            alert("Error!!!" + response.error);
-         } else {
-            // console.log("Response:", response.session);
-            this.props.onUpdateSession(JSON.parse(response.session));
-         }
-      });
-  }
+      if (mode === 'read-only') {
+         Backend.queryReadOnly(session.id, llm_input, response => {
+            this.setState({ loading: false });
+            if (response.error != null) {
+                  alert("Error!!!" + response.error);
+            } else {
+                  this.setState({ llm_answer: response.llm_answer });
+            }
+         });
+      } else {
+         Backend.updateSessionWithLlm(session.id, llm_input, selected_table_idx, mode, response => {
+            this.setState({ loading: false });
+            if (response.error != null) {
+                  alert("Error!!!" + response.error);
+            } else {
+                  this.props.onUpdateSession(JSON.parse(response.session));
+            }
+         });
+      }
+   }
 
 }

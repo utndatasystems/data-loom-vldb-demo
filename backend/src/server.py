@@ -202,6 +202,31 @@ def update_session_with_llm(session_id):
         return {"error": str(e)}
 
 
+@app.route('/rest/query-read-only/<session_id:int>', method=['POST'])
+def query_read_only(session_id):
+    data = request.json
+    question = data['question']
+
+    assert question is not None
+
+    try:
+        session = session_manager.get_session(session_id)
+
+        # Combine into single prompt
+        all_tables = [{"name": table["name"], "attributes": table["attributes"]} for table in session.tables]
+        combined_prompt = f"""Here are the tables:\n{json.dumps(all_tables)}\n\n{question}\nPlease provide an answer without any JSON formatting or updates."""
+
+        # Prompt the llm
+        res = data_loom.llm.chat(combined_prompt)
+        res = res.replace("'", '"')
+
+        response.content_type = 'application/json'
+        return {"llm_answer": res}
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}
+
+
 # !!! Needs to go last
 @app.route('/', method='OPTIONS')
 @app.route('/<path:path>', method=['OPTIONS', "GET", "POST"])

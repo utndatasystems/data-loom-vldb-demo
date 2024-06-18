@@ -108,6 +108,12 @@ export function updateSessionWithLlm(session_id, question, table_idx, mode, next
     }, next);
 }
 
+export function queryReadOnly(session_id, question, next) {
+    do_request("POST", buildRestUri("query-read-only", session_id), {
+        question: question
+    }, next);
+}
+
 export function updateSession(session_id, tables, unknown_files, next) {
     do_request("POST", buildRestUri("update-session", session_id), {
         tables: tables,
