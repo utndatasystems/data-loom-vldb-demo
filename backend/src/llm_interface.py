@@ -54,6 +54,7 @@ class LLM:
 
     @staticmethod
     def parse_json_from_response(response: str):
+        response = response.replace("'", '"')  # LLM tends to return single quotes
         # Sometimes the llm wraps its response in triple backticks (code formatting) -> remove those
         if response.startswith("```\n") and response.endswith("\n```"):
             response = response[4:-4]

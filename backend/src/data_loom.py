@@ -76,7 +76,6 @@ class DataLoom:
 
         # Prompt the llm
         res = self.llm.chat(prompt)
-        res = res.replace("'", '"')  # LLM tends to return single quotes
         new_table = LLM.parse_json_from_response(res)
 
         # Write result back to session
@@ -91,7 +90,6 @@ class DataLoom:
 
         # Prompt the llm
         res = self.llm.chat(combined_prompt)
-        res = res.replace("'", '"')
 
         # Parse response
         responses = LLM.parse_json_from_response(res)
