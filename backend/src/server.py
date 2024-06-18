@@ -31,32 +31,27 @@ def create_session():
     assert uri != None
     s3_access_key_id = data['s3_access_key_id']
     s3_secret_access_key = data['s3_secret_access_key']
+
+    # Create session
     session = Session(None, uri, s3_access_key_id, s3_secret_access_key)
     session_manager.create_session(session)
     print("created session: " + str(session.id))
 
-    try:
-        data_loom.do_table_discovery(session)
-        data_loom.do_table_schema_inference(session)
-        session_manager.update_session(session)
+    # Do schema inference
+    data_loom.do_table_discovery(session)
+    data_loom.do_table_schema_inference(session)
+    session_manager.update_session(session)
 
-        response.content_type = 'application/json'
-        return {"session_id": session.id}
-    except Exception as e:
-        print(e)
-        return {"error": str(e)}
+    # Reply
+    response.content_type = 'application/json'
+    return {"session_id": session.id}
 
 
 @app.route('/rest/get-session/<session_id:int>', method=['GET'])
 def get_session(session_id):
-
-    try:
-        session = session_manager.get_session(session_id)
-        response.content_type = 'application/json'
-        return {"session": json.dumps(vars(session))}
-    except Exception as e:
-        print(e)
-        return {"error": str(e)}
+    session = session_manager.get_session(session_id)
+    response.content_type = 'application/json'
+    return {"session": json.dumps(vars(session))}
 
 
 @app.route('/rest/load-table/<session_id:int>', method=['POST'])
@@ -67,18 +62,23 @@ def load_table(session_id):
     assert table_name != None
     assert database_name != None
 
+    # Create sql code
+    session = session_manager.get_session(session_id)
+    table = session.find_table(table_name)
+    sql_statements = SqlGenerator.create_and_load_table(session, table)
+
+    # Run sql on database, this might actually fail
     try:
-        session = session_manager.get_session(session_id)
-        table = session.find_table(table_name)
-        sql_statements = SqlGenerator.create_and_load_table(session, table)
         Database.create(database_name).run_queries(sql_statements)
-        response.content_type = 'application/json'
-        table["loaded"] = "yes"
-        session_manager.update_session(session)
-        return {"session": json.dumps(vars(session))}
     except Exception as e:
         print(e)
         return {"error": str(e)}
+
+    # Send updated session (table loaded = true)
+    response.content_type = 'application/json'
+    table["loaded"] = "yes"
+    session_manager.update_session(session)
+    return {"session": json.dumps(vars(session))}
 
 
 @app.route('/rest/create-sql/<session_id:int>', method=['POST'])
@@ -87,15 +87,11 @@ def create_sql(session_id):
     table_name = data['table_name']
     assert table_name != None
 
-    try:
-        session = session_manager.get_session(session_id)
-        table = session.find_table(table_name)
-        sql_statements = SqlGenerator.create_and_load_table(session, table)
-        response.content_type = 'application/json'
-        return {"sql": '\n'.join(sql_statements)}
-    except Exception as e:
-        print(e)
-        return {"error": str(e)}
+    session = session_manager.get_session(session_id)
+    table = session.find_table(table_name)
+    sql_statements = SqlGenerator.create_and_load_table(session, table)
+    response.content_type = 'application/json'
+    return {"sql": '\n'.join(sql_statements)}
 
 
 @app.route('/rest/run-query/<session_id:int>', method=['POST'])
@@ -142,16 +138,13 @@ def update_session(session_id):
     assert tables != None
     assert unknown_files != None
 
-    try:
-        session = session_manager.get_session(session_id)
-        session.tables = tables
-        session.unknown_files = unknown_files
-        session_manager.update_session(session)
-        response.content_type = 'application/json'
-        return {"session": json.dumps(vars(session))}
-    except Exception as e:
-        print(e)
-        return {"error": str(e)}
+    # Update the session (table and file list for now)
+    session = session_manager.get_session(session_id)
+    session.tables = tables
+    session.unknown_files = unknown_files
+    session_manager.update_session(session)
+    response.content_type = 'application/json'
+    return {"session": json.dumps(vars(session))}
 
 
 @app.route('/rest/get-file-preview/<session_id:int>', method=['POST'])
@@ -160,17 +153,21 @@ def get_file_preview(session_id):
     file_path = data['file_path']
     assert file_path != None
 
+    session = session_manager.get_session(session_id)
+
+    # Read file, this might fail
     try:
-        session = session_manager.get_session(session_id)
         df = pd.read_csv(session.uri + file_path, nrows=10, header=None)
-        strange_array = df.values
-        proper_array = []
-        for iter in strange_array:
-            proper_array.append(list(iter))
-        return {"file_preview": proper_array}
     except Exception as e:
         print(e)
         return {"error": str(e)}
+
+    # Convert read file to python array
+    pandas_array = df.values
+    python_array = []
+    for iter in pandas_array:
+        python_array.append(list(iter))
+    return {"file_preview": python_array}
 
 
 @app.route('/rest/update-session-with-llm/<session_id:int>', method=['POST'])
@@ -183,23 +180,20 @@ def update_session_with_llm(session_id):
     assert question is not None
     assert mode is not None
 
-    try:
-        session = session_manager.get_session(session_id)
+    # Perform llm action on the session
+    session = session_manager.get_session(session_id)
+    if mode == "table-local":
+        assert table_idx is not None
+        data_loom.do_update_with_question(session, question, table_idx)
+    elif mode == "schema-wide":
+        data_loom.do_update_with_questions(session, question)
+    else:
+        return {"error": "Invalid mode"}
 
-        if mode == "table-local":
-            assert table_idx is not None
-            data_loom.do_update_with_question(session, question, table_idx)
-        elif mode == "schema-wide":
-            data_loom.do_update_with_questions(session, question)
-        else:
-            return {"error": "Invalid mode"}
-
-        session_manager.update_session(session)
-        response.content_type = 'application/json'
-        return {"session": json.dumps(vars(session))}
-    except Exception as e:
-        print(e)
-        return {"error": str(e)}
+    # Send result
+    session_manager.update_session(session)
+    response.content_type = 'application/json'
+    return {"session": json.dumps(vars(session))}
 
 
 @app.route('/rest/query-read-only/<session_id:int>', method=['POST'])
@@ -209,22 +203,20 @@ def query_read_only(session_id):
 
     assert question is not None
 
-    try:
-        session = session_manager.get_session(session_id)
+    session = session_manager.get_session(session_id)
 
-        # Combine into single prompt
-        all_tables = [{"name": table["name"], "attributes": table["attributes"]} for table in session.tables]
-        combined_prompt = f"""Here are the tables:\n{json.dumps(all_tables)}\n\n{question}\nPlease provide an answer without any JSON formatting or updates."""
+    # Combine into single prompt
+    all_tables = [{"name": table["name"], "attributes": table["attributes"]}
+                  for table in session.tables]
+    combined_prompt = f"""Here are the tables:\n{json.dumps(all_tables)}\n\n{
+        question}\nPlease provide an answer without any JSON formatting or updates."""
 
-        # Prompt the llm
-        res = data_loom.llm.chat(combined_prompt)
-        res = res.replace("'", '"')
+    # Prompt the llm
+    res = data_loom.llm.chat(combined_prompt)
+    res = res.replace("'", '"')
 
-        response.content_type = 'application/json'
-        return {"llm_answer": res}
-    except Exception as e:
-        print(e)
-        return {"error": str(e)}
+    response.content_type = 'application/json'
+    return {"llm_answer": res}
 
 
 # !!! Needs to go last
