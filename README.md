@@ -15,34 +15,36 @@ Introducing DataLoom, a web-based prototype that automates the tedious aspects o
 #### Setup
 
 1. Run `requirements.txt` in the backend folder for backend python files.
-2. Run in */backend* and */frontend*:
+   ```
+   pip install -r /path/to/requirements.txt
+   ```
+3. Run in */backend* and */frontend*:
    ```
    npm install
    ```
-3. Add a  `secrets.json` with your OpenAI token to the backend folder.
-
-Format of the `secrets.json` file:
-
-```
-{
-    "ORG": "",
-    "KEY": ""
- }
-```
+4. Add a  `secrets.json` with your OpenAI token to the backend folder.
+   
+   Format of the `secrets.json` file:
+   
+   ```
+   {
+       "ORG": "",
+       "KEY": ""
+    }
+   ```
 
 3. Add data files/folders locally
 4. Add the path to your data files/folders to `data-paths.json` in *frontend/src/*
 5. Start the web application:
 
-
-Start backend:
-
-```
-./node_modules/nodemon/bin/nodemon.js -w src --exec python3 src/server.py
-```
-
-Start frontend:
-
-```
-npm start
-```
+   Start backend:
+   
+   ```
+   ./node_modules/nodemon/bin/nodemon.js -w src --exec python3 src/server.py
+   ```
+   
+   Start frontend:
+   
+   ```
+   npm start
+   ```
