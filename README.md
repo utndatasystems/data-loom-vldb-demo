@@ -10,8 +10,6 @@ Introducing DataLoom, a web-based prototype that automates the tedious aspects o
 
 ---
 
-
-
 #### Setup
 
 1. Run `requirements.txt` in the backend folder for backend python files.
@@ -33,18 +31,21 @@ Introducing DataLoom, a web-based prototype that automates the tedious aspects o
     }
    ```
 
-3. Add data files/folders locally
-4. Add the path to your data files/folders to `data-paths.json` in *frontend/src/*
-5. Start the web application:
+#### Running
 
-   Start backend:
-   
-   ```
-   ./node_modules/nodemon/bin/nodemon.js -w src --exec python3 src/server.py
-   ```
-   
-   Start frontend:
-   
-   ```
-   npm start
-   ```
+Start backend (run in `./backend/`):
+
+```
+./node_modules/nodemon/bin/nodemon.js -w src --exec python3 src/server.py
+```
+
+Start frontend (run in `./frontend/`):
+
+```
+npm start
+```
+
+#### Adding new Datasets
+
+1. Add data files/folders locally.
+2. Add the path to your data files/folders to `data-paths.json` in *frontend/src/*
