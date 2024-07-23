@@ -1,5 +1,6 @@
 {
     "paths": [
+        "../uni/",
         "/Users/lucaheller/Desktop/data-loom/tpch-mixed-1",
         "/Users/alex/workspace/utn-data-loom/tpch-mixed-1"
     ]
