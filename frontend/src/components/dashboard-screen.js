@@ -21,6 +21,7 @@ class Dashboard extends React.Component {
          query: "SELECT relname, pg_size_pretty(pg_total_relation_size(schemaname || '.' || relname)) AS size\nFROM pg_catalog.pg_statio_user_tables\nORDER BY pg_total_relation_size(schemaname || '.' || relname) DESC;",
          query_result: null,
          query_ms: null,
+         llm_suggestion: null,
       };
 
       const session_id = props.params.session_id;
@@ -78,6 +79,7 @@ class Dashboard extends React.Component {
             query={this.state.query}
             query_result={this.state.query_result}
             query_ms={this.state.query_ms}
+            llm_suggestion={this.state.llm_suggestion}
             onUpdateQuery={(query) => this.setState({ query: query })}
             onExecuteQuery={() => this.onExecuteQuery()}
          />);
@@ -97,8 +99,8 @@ class Dashboard extends React.Component {
             <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
                <div className={"button " + (layout != "overview" ? "secondary" : "")} onClick={() => this.setState({ layout: "overview" })}>Table View</div>
                <span> </span>
-               <div className={"button " + (layout != "graph" ? "secondary" : "")} onClick={() => this.setState({ layout: "graph" })}>UML 4.0 View</div>
-               <span> </span>
+               {/* <div className={"button " + (layout != "graph" ? "secondary" : "")} onClick={() => this.setState({ layout: "graph" })}>UML 4.0 View</div>
+               <span> </span> */}
                <div className={"button " + (layout != "database" ? "secondary" : "")} onClick={() => this.setState({ layout: "database" })}>Database View</div>
             </div>
 
@@ -157,17 +159,24 @@ class Dashboard extends React.Component {
    }
 
    onExecuteQuery() {
-      const query = this.state.query
+      const query = this.state.query;
       Backend.run_query(this.state.session.id, this.state.database, query, (response) => {
-         if (response.error != null) {
-            alert("Error!!!" + response.error);
-         }
-         this.setState({
-            query_result: response.query_result,
-            query_ms: response.query_ms,
-         })
-      })
-   }
+          if (!response.query_result || !response.query_result.column_names) {
+              //alert("Error!!! " + response.error);
+              this.setState({
+                  query_result: response.query_result,
+                  query_ms: response.query_ms,
+                  llm_suggestion: response.llm_suggestion || null,
+              });
+              return;
+          }
+          this.setState({
+              query_result: response.query_result,
+              query_ms: response.query_ms,
+              llm_suggestion: null,
+          });
+      });
+  }
 
    onPreviewFile(file_path) {
       Backend.get_file_preview(this.state.session.id, file_path, (response) => {

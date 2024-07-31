@@ -127,7 +127,21 @@ def run_query(session_id):
     except Exception as e:
         print(e)
         # Just show the error to the user
-        return {"query_result": str(e), "query_ms": 0}
+        # return {"query_result": str(e), "query_ms": 0}
+
+        # Get session and table schema
+        session = session_manager.get_session(session_id)
+        schema = [{"name": table["name"], "attributes": table["attributes"]} for table in session.tables]
+        print(f"Schema: {schema}")
+
+        # prompt for LLM
+        prompt = f"""An error occurred while executing the following query:\n{query}\n\nError: {str(e)}\n\nHere is the schema of the tables:\n{json.dumps(schema, indent=2)}\n\nPlease provide suggestions on how to fix the query."""
+
+        # LLM suggestion
+        llm_suggestion = data_loom.llm.chat(prompt)
+
+        response.content_type = 'application/json'
+        return {"query_result": str(e), "query_ms": 0, "llm_suggestion": llm_suggestion}
 
 
 @app.route('/rest/update-session/<session_id:int>', method=['POST'])

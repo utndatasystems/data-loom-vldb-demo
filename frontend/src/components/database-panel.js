@@ -19,6 +19,18 @@ export default class TableOverview extends React.Component {
       this.props.onUpdateQuery(e)
    }
 
+   // extractQuery(llmSuggestion) {
+   //    // Extract all SQL statements
+   //    // TODO: further tests
+   //    const regex = /```[^]*?```/gm;
+   //    const matches = llmSuggestion.match(regex);
+   //    if (matches) {
+   //       return matches.join('\n');
+   //    }
+   //    console.log(llmSuggestion);
+   //    return llmSuggestion;
+   // }
+
    render() {
       this.refreshCaches()
       const tables = this.props.session.tables
@@ -59,23 +71,39 @@ export default class TableOverview extends React.Component {
    }
 
    renderTable() {
-      const query_result = this.props.query_result
-      const query_ms = this.props.query_ms
+      const query_result = this.props.query_result;
+      const query_ms = this.props.query_ms;
+      const llm_suggestion = this.props.llm_suggestion;
 
       if (query_result == null) {
          return null;
       }
 
       // For nanook, the result is a string
-      if (query_result.column_names === undefined) {
-         return (
-            <div>
-               <h4>Result</h4>
-               <span>Runtime: {query_ms.toFixed(1)}ms</span>
-               <pre>{query_result}</pre>
-            </div>
-         );
-      }
+    if (query_result.column_names === undefined) {
+      return (
+          <div>
+              <h4>Result</h4>
+              <span>Runtime: {query_ms.toFixed(1)}ms</span>
+              <pre>{query_result}</pre>
+              {llm_suggestion && (
+                  <div>
+                      <h4>LLM Suggestion</h4>
+                      <pre style={{ border: '1px dashed #000', padding: '20px', borderRadius: '5px' }}>{llm_suggestion}</pre>
+                  </div>
+              )}
+              {/* {this.props.llm_suggestion && (
+                  <button
+                     className={"button info"}
+                     onClick={() => this.onUpdateQuery(this.extractQuery(this.props.llm_suggestion))}
+                     style={{ marginLeft: '10px' }}
+                  >
+                     Use LLM Suggestion
+                  </button>
+               )} */}
+          </div>
+      );
+  }
 
       const column_names = query_result.column_names
       const rows = query_result.rows
@@ -88,7 +116,7 @@ export default class TableOverview extends React.Component {
                <table className="table-scroll" style={{ fontSize: "10pt" }}>
                   <thead>
                      <tr>
-                        {column_names.map((name, idx) => { return <th key={idx}>{name}</th> })}
+                        {column_names.map((name, idx) => <th key={idx}>{name}</th> )}
                      </tr>
                   </thead>
                   <tbody>
@@ -96,6 +124,12 @@ export default class TableOverview extends React.Component {
                   </tbody>
                </table>
             </div>
+            {llm_suggestion && (
+                <div>
+                    <h4>LLM Suggestion</h4>
+                    <pre>{llm_suggestion}</pre>
+                </div>
+            )}
          </div>
       );
    }
