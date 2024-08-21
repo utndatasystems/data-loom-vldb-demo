@@ -32,7 +32,7 @@ Introducing DataLoom, a web-based prototype that automates the tedious aspects o
        "KEY": ""
     }
    ```
-4. Run the following command to download the required `.jar` files for profiling.
+4. Run the following command to download the required `.jar` files for profiling in `./backend/`.
 
    ```
    ./download.sh

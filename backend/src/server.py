@@ -14,8 +14,8 @@ import pandas as pd
 # Check on required .jar files for profiling
 def jar_files_check():
     required_files = [
-        '../profiling/metanome-cli-1.1.0.jar',
-        '../profiling/pyro-distro-1.0-SNAPSHOT-distro.jar'
+        'profiling/metanome-cli-1.1.0.jar',
+        'profiling/pyro-distro-1.0-SNAPSHOT-distro.jar'
     ]
 
     missing_files = [f for f in required_files if not os.path.isfile(f)]
@@ -269,7 +269,7 @@ def run_profiling(session_id):
     algorithm_mapping = {
         'default_algorithm': {
             'class': 'de.hpi.isg.pyro.algorithms.ADuccDfd',
-            'jar_path': os.path.join(parent_dir, "profiling/pyro-distro-1.0-SNAPSHOT-distro.jar")
+            'jar_path': os.path.join(parent_dir, "backend/profiling/pyro-distro-1.0-SNAPSHOT-distro.jar")
         }
     }
 
@@ -295,7 +295,7 @@ def run_profiling(session_id):
         table_name = table['name']
         file_path = os.path.join(session.uri, table_name + ".csv")
 
-        cli_path = os.path.join(parent_dir, "profiling/metanome-cli-1.1.0.jar")
+        cli_path = os.path.join(parent_dir, "backend/profiling/metanome-cli-1.1.0.jar")
 
         # Profiling command to use selected algorithm
         profiling_command = f'java -Dtinylog.level=trace -cp "{cli_path}":"{selected_jar_path}" de.metanome.cli.App -a {selected_algorithm_class} --files "{file_path}" -o print --file-key "inputFile" --separator "{separator}"'
