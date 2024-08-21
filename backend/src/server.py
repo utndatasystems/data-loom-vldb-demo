@@ -242,8 +242,25 @@ def run_profiling(session_id):
     table_name = data.get('table_name', None)
     separator = data.get('separator', ',')
     target = data.get('target', 'single')
+    algorithm = data.get('algorithm', 'default_algorithm')
 
     session = session_manager.get_session(session_id)
+
+    parent_dir = os.path.dirname(session.uri)
+
+    # TODO: Define other algorithms
+    algorithm_mapping = {
+        'default_algorithm': {
+            'class': 'de.hpi.isg.pyro.algorithms.ADuccDfd',
+            'jar_path': os.path.join(parent_dir, "profiling/pyro-distro-1.0-SNAPSHOT-distro.jar")
+        }
+    }
+
+    if algorithm not in algorithm_mapping:
+        return {"error": "Invalid algorithm specified."}
+
+    selected_algorithm_class = algorithm_mapping[algorithm]['class']
+    selected_jar_path = algorithm_mapping[algorithm]['jar_path']
 
     profiling_results = {}
 
@@ -260,19 +277,21 @@ def run_profiling(session_id):
             continue
         table_name = table['name']
         file_path = os.path.join(session.uri, table_name + ".csv")
-        parent_dir = os.path.dirname(session.uri)
 
         cli_path = os.path.join(parent_dir, "profiling/metanome-cli-1.1.0.jar")
-        algo_path = os.path.join(parent_dir, "profiling/pyro-distro-1.0-SNAPSHOT-distro.jar")
 
-        # run profiling
-        profiling_command = f'java -Dtinylog.level=trace -cp "{cli_path}":"{algo_path}" de.metanome.cli.App -a de.hpi.isg.pyro.algorithms.ADuccDfd --files "{file_path}" -o print --file-key "inputFile" --separator "{separator}"'
+        # Profiling command to use selected algorithm
+        profiling_command = f'java -Dtinylog.level=trace -cp "{cli_path}":"{selected_jar_path}" de.metanome.cli.App -a {selected_algorithm_class} --files "{file_path}" -o print --file-key "inputFile" --separator "{separator}"'
 
         try:
             profiling_result = subprocess.check_output(profiling_command, shell=True, universal_newlines=True)
             profiling_results[table_name] = parse_profiling_result(profiling_result)
         except subprocess.CalledProcessError as e:
             profiling_results[table_name] = {"error": str(e), "output": e.output}
+
+    if target == 'all':
+        session.profiling_status[algorithm] = True
+        session_manager.update_session(session)
 
     response.content_type = 'application/json'
     return {"profiling_results": profiling_results}

@@ -11,7 +11,22 @@ class ProfilingPanel extends React.Component {
             localUCs: {},  // Store UCs temporarily
             hasUcChanges: false,  // Track if there are UCs to apply
             completedTables : 0, // Track completion of profiling for all tables
+            selectedAlgorithm: 'default_algorithm',
+            profilingStatus: {},
         };
+    }
+
+    componentDidMount() {
+        const { session } = this.props;
+        // Load session to get profiling status
+        Backend.get_session(session.id, (response) => {
+            const sessionData = JSON.parse(response.session);
+            this.setState({ profilingStatus: sessionData.profiling_status || {} });
+        });
+    }
+
+    handleAlgorithmChange(event) {
+        this.setState({ selectedAlgorithm: event.target.value });
     }
 
     handleTargetChange(event) {
@@ -21,7 +36,7 @@ class ProfilingPanel extends React.Component {
 
     runProfiling() {
         const { session, selected_table_idx } = this.props;
-        const target = this.state.target;
+        const { target, selectedAlgorithm } = this.state;
         let tablesToProfile = [];
     
         if (target === 'single') {
@@ -32,7 +47,7 @@ class ProfilingPanel extends React.Component {
         }
     
         tablesToProfile.forEach(table_name => {
-            Backend.run_profiling(session.id, table_name, ",", target, (response) => {
+            Backend.run_profiling(session.id, table_name, ",", target, selectedAlgorithm, (response) => {
                 if (response.error) {
                     alert("Profiling Error: " + response.error);
                     return;
@@ -68,21 +83,31 @@ class ProfilingPanel extends React.Component {
                 });
     
                 // Update state with mapped results
-                this.setState(prevState => ({
-                    profiling_result: {
-                        ...prevState.profiling_result,
-                        [table_name]: {
-                            ucs: mappedUCs,
-                            fds: mappedFDs
-                        }
-                    },
-                    localUCs: {
-                        ...prevState.localUCs,
-                        [table_name]: mappedUCs
-                    },
-                    hasUcChanges: true,
-                    completedTables: prevState.completedTables + 1
-                }));
+                this.setState(prevState => {
+                    const newCompletedTables = prevState.completedTables + 1;
+                    const isComplete = target === 'all' && newCompletedTables === tablesToProfile.length;
+
+                    return {
+                        profiling_result: {
+                            ...prevState.profiling_result,
+                            [table_name]: {
+                                ucs: mappedUCs,
+                                fds: mappedFDs
+                            }
+                        },
+                        localUCs: {
+                            ...prevState.localUCs,
+                            [table_name]: mappedUCs
+                        },
+                        hasUcChanges: true,
+                        completedTables: newCompletedTables,
+                        profilingComplete: isComplete,
+                        profilingStatus: {
+                            ...prevState.profilingStatus,
+                            [selectedAlgorithm]: isComplete ? true : prevState.profilingStatus[selectedAlgorithm],
+                        },
+                    };
+                });
             });
         });
     }
@@ -136,7 +161,7 @@ class ProfilingPanel extends React.Component {
 
     render() {
         const { session } = this.props;
-        const { target, hasUcChanges, completedTables } = this.state;
+        const { target, hasUcChanges, completedTables, selectedAlgorithm, profilingStatus } = this.state;
         const totalTables = target === 'single' ? 1 : session.tables.length;
 
         return (
@@ -162,6 +187,22 @@ class ProfilingPanel extends React.Component {
                         Run Profiling on All Tables
                     </label>
                 </div>
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '10px' }}>
+                        <span>Select Algorithm:</span>
+                        <select
+                            value={selectedAlgorithm}
+                            onChange={(e) => this.handleAlgorithmChange(e)}
+                            style={{
+                                marginLeft: '10px',
+                                color: profilingStatus[selectedAlgorithm] ? 'green' : 'black',
+                            }}
+                        >
+                            <option value="default_algorithm">Pyro Algorithm</option>
+                            <option value="algorithm_1">Algorithm test</option>
+                        </select>
+                    </label>
+                </div>
                 <div>
                     <button
                         onClick={() => this.runProfiling()}
@@ -177,7 +218,6 @@ class ProfilingPanel extends React.Component {
                         Execute Profiling
                     </button>
                 </div>
-                {/* Apply changes when profiling fulfilled for all tables  */}
                 {hasUcChanges && completedTables === totalTables && (
                     <div>
                         <button

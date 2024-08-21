@@ -121,11 +121,12 @@ export function updateSession(session_id, tables, unknown_files, next) {
     }, next);
 }
 
-export function run_profiling(session_id, table_name, separator = ",", target = "single", next) {
+export function run_profiling(session_id, table_name, separator = ",", target = "single", algorithm="default_algorithm", next) {
     do_request("POST", buildRestUri("run-profiling", session_id), {
         table_name: table_name,
         separator: separator,
-        target: target
+        target: target,
+        algorithm: algorithm,
     }, next);
 }
 

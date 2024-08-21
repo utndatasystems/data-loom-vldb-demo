@@ -15,6 +15,7 @@ class Session:
         self.tables = []
         self.unknown_files = []
         self.llm_log = []
+        self.profiling_status = {}
 
     def add_to_llm_log(self, input: str, output: str):
         self.llm_log.append({
