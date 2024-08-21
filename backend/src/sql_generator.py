@@ -15,8 +15,23 @@ class SqlGenerator:
     def _create_table_statement(table):
         attributes = table["attributes"]
         columns = [SqlGenerator._create_column(col) for col in attributes]
-        sql = f'create table {table["name"]} ({", ".join(columns)});'
+
+        # add unique constraints
+        unique_constraints = SqlGenerator._create_unique_constraints(table)
+
+        sql = f'create table {table["name"]} ({", ".join(columns)}{unique_constraints});'
         return sql
+
+    @staticmethod
+    def _create_unique_constraints(table):
+        """Generates the SQL part for unique constraints."""
+        ucs = table.get('ucs', [])
+        if not ucs:
+            return ''
+
+        # Create string for UNIQUEs
+        uc_columns = [f'UNIQUE ({uc.strip("[]")})' for uc in ucs]
+        return ", " + ", ".join(uc_columns)
 
     @staticmethod
     def _load_table_statements(session, table):
