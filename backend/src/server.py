@@ -10,6 +10,23 @@ import re
 import subprocess
 import pandas as pd
 
+
+# Check on required .jar files for profiling
+def jar_files_check():
+    required_files = [
+        '../profiling/metanome-cli-1.1.0.jar',
+        '../profiling/pyro-distro-1.0-SNAPSHOT-distro.jar'
+    ]
+
+    missing_files = [f for f in required_files if not os.path.isfile(f)]
+
+    if missing_files:
+        print("Warning: Required .jar files for profiling are missing!!!")
+        print("Please run `./download.sh` to download them.")
+
+
+jar_files_check()
+
 app = Bottle()
 data_loom = DataLoom()
 session_manager = SessionManager()

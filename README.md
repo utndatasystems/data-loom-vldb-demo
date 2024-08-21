@@ -13,22 +13,29 @@ Introducing DataLoom, a web-based prototype that automates the tedious aspects o
 #### Setup
 
 1. Run `requirements.txt` in the backend folder for backend python files.
+
    ```
    pip install -r /path/to/requirements.txt
    ```
-3. Run in */backend* and */frontend*:
+2. Run in */backend* and */frontend*:
+
    ```
    npm install
    ```
-4. Add a  `secrets.json` with your OpenAI token to the backend folder.
-   
+3. Add a  `secrets.json` with your OpenAI token to the backend folder.
+
    Format of the `secrets.json` file:
-   
+
    ```
    {
        "ORG": "",
        "KEY": ""
     }
+   ```
+4. Run the following command to download the required `.jar` files for profiling.
+
+   ```
+   ./download.sh
    ```
 
 #### Running
