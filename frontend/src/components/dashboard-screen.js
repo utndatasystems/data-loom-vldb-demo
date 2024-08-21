@@ -4,6 +4,7 @@ import GraphPanel from './graph-panel.js';
 import OverviewPanel from './overview-panel.js';
 import DatabasePanel from './database-panel.js';
 import FilePreviewPanel from './file-preview-panel.js';
+import ProfilingPanel from './profiling_panel.js';
 import * as Backend from '../backend.js';
 import * as util from "../other/util.js";
 import LlmPanel from './llm-panel.js';
@@ -39,6 +40,8 @@ class Dashboard extends React.Component {
             selected_table_idx: 0,
             session: JSON.parse(res.session),
          });
+
+         this.tablePanelRef = React.createRef();
       });
    }
 
@@ -91,6 +94,16 @@ class Dashboard extends React.Component {
             file_preview={this.state.file_preview}
          />);
       }
+      if (layout === "profiling") {
+         main_panel = (<ProfilingPanel
+             session={session}
+             selected_table_idx={this.state.selected_table_idx}
+             onUpdateSession={(updatedSession) => this.setState({ session: updatedSession })}
+             applyUcChanges={() => this.tablePanelRef.current.applyUcChanges()}
+         />
+      );
+     }
+     
 
       const database = this.state.database
 
@@ -102,6 +115,8 @@ class Dashboard extends React.Component {
                {/* <div className={"button " + (layout != "graph" ? "secondary" : "")} onClick={() => this.setState({ layout: "graph" })}>UML 4.0 View</div>
                <span> </span> */}
                <div className={"button " + (layout != "database" ? "secondary" : "")} onClick={() => this.setState({ layout: "database" })}>Database View</div>
+               <span> </span>
+               <div className={"button " + (layout != "profiling" ? "secondary" : "")} onClick={() => this.setState({ layout: "profiling" })}>Profiling View</div>
             </div>
 
             <div className="large-6 medium-6 cell" style={{ marginTop: "16px", marginBottom: "-16px" }}>
@@ -121,6 +136,7 @@ class Dashboard extends React.Component {
                   <div className="large-4 cell">
                      <div className="callout">
                         <TablePanel
+                           ref={this.tablePanelRef}
                            session={session}
                            database={database}
                            selected_table_idx={this.state.selected_table_idx}

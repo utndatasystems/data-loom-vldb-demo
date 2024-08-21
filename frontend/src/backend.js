@@ -120,3 +120,12 @@ export function updateSession(session_id, tables, unknown_files, next) {
         unknown_files: unknown_files,
     }, next);
 }
+
+export function run_profiling(session_id, table_name, separator = ",", target = "single", next) {
+    do_request("POST", buildRestUri("run-profiling", session_id), {
+        table_name: table_name,
+        separator: separator,
+        target: target
+    }, next);
+}
+

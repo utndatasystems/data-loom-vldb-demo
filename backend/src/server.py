@@ -5,6 +5,9 @@ from sql_generator import SqlGenerator
 from database import Database
 import json
 import time
+import os
+import re
+import subprocess
 import pandas as pd
 
 app = Bottle()
@@ -231,6 +234,68 @@ def query_read_only(session_id):
 
     response.content_type = 'application/json'
     return {"llm_answer": res}
+
+
+@app.route('/rest/run-profiling/<session_id:int>', method=['POST'])
+def run_profiling(session_id):
+    data = request.json
+    table_name = data.get('table_name', None)
+    separator = data.get('separator', ',')
+    target = data.get('target', 'single')
+
+    session = session_manager.get_session(session_id)
+
+    profiling_results = {}
+
+    # single table or all tables
+    if target == 'single':
+        tables_to_profile = [session.find_table(table_name)]
+    elif target == 'all':
+        tables_to_profile = session.tables
+    else:
+        return {"error": "Invalid target specified."}
+
+    for table in tables_to_profile:
+        if not table:
+            continue
+        table_name = table['name']
+        file_path = os.path.join(session.uri, table_name + ".csv")
+        parent_dir = os.path.dirname(session.uri)
+
+        cli_path = os.path.join(parent_dir, "profiling/metanome-cli-1.1.0.jar")
+        algo_path = os.path.join(parent_dir, "profiling/pyro-distro-1.0-SNAPSHOT-distro.jar")
+
+        # run profiling
+        profiling_command = f'java -Dtinylog.level=trace -cp "{cli_path}":"{algo_path}" de.metanome.cli.App -a de.hpi.isg.pyro.algorithms.ADuccDfd --files "{file_path}" -o print --file-key "inputFile" --separator "{separator}"'
+
+        try:
+            profiling_result = subprocess.check_output(profiling_command, shell=True, universal_newlines=True)
+            profiling_results[table_name] = parse_profiling_result(profiling_result)
+        except subprocess.CalledProcessError as e:
+            profiling_results[table_name] = {"error": str(e), "output": e.output}
+
+    response.content_type = 'application/json'
+    return {"profiling_results": profiling_results}
+
+
+def parse_profiling_result(result):
+    ucs = []
+    fds = []
+
+    for line in result.splitlines():
+        line = line.strip()
+        if line.startswith('['):
+            if '->' in line:
+                fds.append(line.strip())
+            else:
+                # For UCs, construct string
+                columns = re.findall(r'\[(.*?)\]', line)
+                if columns:
+                    for column in columns:
+                        fully_qualified_name = f"[{column}]"
+                        ucs.append(fully_qualified_name)
+
+    return {"ucs": ucs, "fds": fds}
 
 
 # !!! Needs to go last

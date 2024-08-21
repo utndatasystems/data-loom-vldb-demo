@@ -42,39 +42,71 @@ export default class TablePanel extends React.Component {
       );
    }
 
-   renderAttributes(table) {
+   renderApplyUcButton() {
       return (
-         <div>
-            <h5>Attributes</h5>
-            <table style={{ fontSize: "10pt", borderCollapse: "collapse" }}>
-               <thead>
-                  <tr>
-                     <th>Attribute</th>
-                     <th>Type</th>
-                     <th>Nullable</th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {table.attributes.map((attribute, index) => {
-                     return (
-                        <tr key={index}>
-                           <td style={{ padding: "5px", margin: "5px" }}>
-                              <pre onClick={() => { this.onEditAttributeName(attribute) }} style={{ cursor: "pointer" }}>{attribute.name}</pre>
-                           </td>
-                           <td style={{ padding: "5px", margin: "5px" }}>
-                              <pre onClick={() => { this.onEditAttributeType(attribute) }} style={{ cursor: "pointer" }}>{attribute.type}</pre>
-                           </td>
-                           <td style={{ padding: "5px", margin: "5px" }}>
-                              <pre onClick={() => { this.onEditAttributeNullability(attribute) }} style={{ cursor: "pointer" }}>{attribute.null ? "nullable" : "not null"}</pre>
-                           </td>
-                        </tr>
-                     );
-                  })}
-               </tbody>
-            </table>
+         <div style={{ marginTop: '20px' }}>
+            <button
+               onClick={() => this.props.applyUcChanges()}
+               style={{
+                  backgroundColor: '#28a745',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+               }}
+            >
+               Apply UCCs
+            </button>
          </div>
       );
    }
+
+   renderAttributes(table) {
+      return (
+          <div>
+              <h5>Attributes</h5>
+              <table style={{ fontSize: "10pt", borderCollapse: "collapse" }}>
+                  <thead>
+                      <tr>
+                          <th>Attribute</th>
+                          <th>Type</th>
+                          <th>Nullable</th>
+                          <th>Unique Constraints</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {table.attributes.map((attribute, index) => {
+                          return (
+                              <tr key={index}>
+                                  <td style={{ padding: "5px", margin: "5px" }}>
+                                      <pre onClick={() => { this.onEditAttributeName(attribute) }} style={{ cursor: "pointer" }}>{attribute.name}</pre>
+                                  </td>
+                                  <td style={{ padding: "5px", margin: "5px" }}>
+                                      <pre onClick={() => { this.onEditAttributeType(attribute) }} style={{ cursor: "pointer" }}>{attribute.type}</pre>
+                                  </td>
+                                  <td style={{ padding: "5px", margin: "5px" }}>
+                                      <pre onClick={() => { this.onEditAttributeNullability(attribute) }} style={{ cursor: "pointer" }}>{attribute.null ? "nullable" : "not null"}</pre>
+                                  </td>
+                                  <td style={{ padding: "5px", margin: "5px" }}>
+                                      <pre>{this.getUniqueConstraintsForAttribute(attribute.name, table.ucs)}</pre>
+                                  </td>
+                              </tr>
+                          );
+                      })}
+                  </tbody>
+              </table>
+          </div>
+      );
+  }
+  
+  getUniqueConstraintsForAttribute(attributeName, ucs) {
+      if (!ucs || !Array.isArray(ucs)) {
+          return 'Not profiled yet';
+      }
+      return ucs.includes(`[${attributeName}]`) ? 'Unique' : ''; // If attribute in UCs, mark as unique
+  }
+  
 
    renderFiles(table) {
       return (
