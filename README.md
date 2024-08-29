@@ -1,6 +1,8 @@
-### Data Loom
+### DataLoom
 
 ---
+
+Paper: https://www.vldb.org/pvldb/vol17/p4449-renen.pdf
 
 #### Introduction
 
